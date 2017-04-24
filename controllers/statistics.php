@@ -15,13 +15,73 @@ class Statistics extends MY_Controller
 
         $this->data['userIsAllowed'] = TRUE;
 
+        $this->load->model('Storage_model');
+        $this->load->model('User_model');
+
         $this->load->library('module', array(__DIR__));
         $this->load->library('pathlibrary');
+
+        // check rights
+        $method = $this->router->fetch_method();
+        $userType = $this->User_model->getType();
+        if ($userType != 'rodsadmin' && $method != 'not_allowed') {
+            return redirect('statistics/not_allowed');
+        }
     }
 
     public function index()
     {
-        echo 'hello';
+        $this->load->view('common-start', array(
+            'styleIncludes' => array(
+                'lib/font-awesome/css/font-awesome.css',
+                'css/statistics.css',
+            ),
+            'scriptIncludes' => array(
+                'js/statistics.js'
+            ),
+            'activeModule'   => $this->module->name(),
+            'user' => array(
+                'username' => $this->rodsuser->getUsername(),
+            ),
+        ));
+
+        $this->data['resources'] = $this->Storage_model->getResources();
+
+
+        $this->load->view('start', $this->data);
+        $this->load->view('common-end');
+    }
+
+    public function resource_details()
+    {
+        $rodsaccount = $this->rodsuser->getRodsAccount();
+        $pathStart = $this->pathlibrary->getPathStart($this->config);
+        $resourceName = $this->input->get('resource');
+
+        $viewData = array('name' => $resourceName);
+        $html = $this->load->view('detail', $viewData, true);
+
+        echo json_encode(array('status' => 'success', 'html' => $html));
+    }
+
+    public function not_allowed()
+    {
+        $this->load->view('common-start', array(
+            'styleIncludes' => array(
+                'lib/font-awesome/css/font-awesome.css',
+                'css/statistics.css',
+            ),
+            'scriptIncludes' => array(
+                'js/statistics.js'
+            ),
+            'activeModule'   => $this->module->name(),
+            'user' => array(
+                'username' => $this->rodsuser->getUsername(),
+            ),
+        ));
+
+        $this->load->view('not_allowed', $this->data);
+        $this->load->view('common-end');
     }
 
 }

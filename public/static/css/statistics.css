@@ -1,0 +1,89 @@
+.grey,
+i.form-control-feedback.glyphicon {
+    color: #aaa;
+}
+
+.select2-highlighted .grey {
+    color: #ddd;
+}
+
+.panel > .list-group .list-group .list-group-item {
+    border-bottom: 1px solid #ddd;
+}
+
+.panel > .list-group .list-group {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+.panel > .list-group .list-group .list-group .list-group-item {
+    padding-left: 40px;
+}
+
+.list-group a.list-group-item {
+    cursor: pointer;
+}
+
+#group-list {
+    /*
+    min-height: 320px;
+    max-height: 320px;
+    */
+    overflow: auto;
+}
+
+#group-list a {
+    display: block;
+}
+
+#group-list .list-group,
+#group-list .list-group .list-group-item {
+    border-radius: 0;
+}
+
+#group-list + .panel-footer {
+    border-top: 1px solid #ddd
+}
+
+#user-list .user .glyphicon {
+    padding-right: 8px;
+}
+
+#user-list .disabled.self {
+    cursor: default;
+}
+
+#user-list .self:after {
+    content: ' (you)';
+}
+
+#user-list .list-group-item #f-user-create {
+    margin: -5px -5px;
+}
+
+.placeholder-text {
+    font-style: italic;
+    color: #aaa;
+}
+
+.item-user-create .user-create-text {
+    text-decoration: underline
+}
+
+.list-group-item.filtered {
+    display: none;
+}
+
+.list-group-item.blink-once {
+    -webkit-animation: blink-once 1s;
+    -moz-animation: blink-once 1s;
+    animation: blink-once 1s;
+}
+
+@-webkit-keyframes blink-once {
+    from { background-color: rgba(255,220,50,1.0); }
+    to   { background-color: rgba(255,220,50,0.0); }
+}
+@keyframes blink-once {
+    from { background-color: rgba(255,220,50,1.0); }
+    to   { background-color: rgba(255,220,50,0.0); }
+}
