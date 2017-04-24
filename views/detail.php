@@ -13,7 +13,7 @@
             <div class="form-group">
                 <label class="col-sm-4 control-label">Tier</label>
                 <div class="col-sm-8">
-                    <input type="text" class="tier-select" value="<?php echo $tier; ?>">
+                    <input type="text" class="tier-select" value="<?php echo htmlentities($tier); ?>">
                 </div>
             </div>
             <div class="form-group">
