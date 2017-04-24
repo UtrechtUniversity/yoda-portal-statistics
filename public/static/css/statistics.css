@@ -87,3 +87,7 @@ i.form-control-feedback.glyphicon {
     from { background-color: rgba(255,220,50,1.0); }
     to   { background-color: rgba(255,220,50,0.0); }
 }
+
+.tier-select {
+    width: 300px;
+}

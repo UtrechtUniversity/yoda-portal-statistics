@@ -17,6 +17,7 @@ class Statistics extends MY_Controller
 
         $this->load->model('Storage_model');
         $this->load->model('User_model');
+        $this->load->model('Tier_model');
 
         $this->load->library('module', array(__DIR__));
         $this->load->library('pathlibrary');
@@ -58,10 +59,27 @@ class Statistics extends MY_Controller
         $pathStart = $this->pathlibrary->getPathStart($this->config);
         $resourceName = $this->input->get('resource');
 
-        $viewData = array('name' => $resourceName);
+        $information = $this->Storage_model->getResource($resourceName);
+
+        $viewData = array('name' => $information['resourceName'], 'tier' => $information['resourceTier']);
         $html = $this->load->view('detail', $viewData, true);
 
         echo json_encode(array('status' => 'success', 'html' => $html));
+    }
+
+    public function get_tiers()
+    {
+        $tiers = $this->Tier_model->listTiers();
+        echo json_encode($tiers);
+    }
+
+    public function edit_tier()
+    {
+        $resource = $this->input->post('resource');
+        $value = $this->input->post('value');
+
+        $result = $this->Storage_model->setResourceTier($resource, $value);
+        echo json_encode(array('status' => $result));
     }
 
     public function not_allowed()
