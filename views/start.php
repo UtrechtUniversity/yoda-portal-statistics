@@ -11,6 +11,9 @@
                     <div class="list-group">
                         <a class="list-group-item resource" data-name="<?php echo $resource['name']; ?>">
                             <?php echo $resource['name']; ?>
+                            <small class="pull-right resource-tier" title="<?php echo htmlentities($resource['tier']); ?>">
+                                <?php echo (strlen($resource['tier']) > 10 ? htmlentities(substr($resource['tier'], 0, 10)) . '...' : $resource['tier']); ?>
+                            </small>
                         </a>
                     </div>
                 <?php } ?>

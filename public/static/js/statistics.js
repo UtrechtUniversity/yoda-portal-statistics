@@ -95,10 +95,28 @@ function editTier(resource, val)
                 $('#messages').html('<div class="alert alert-danger"><button class="close" data-dismiss="alert"><span>×</span></button><p>Could not update ' + resource + ' properties  due to an internal error.</p></div>');
             }
 
+            $('.list-group-item.active .resource-tier').attr('title', htmlDecode(val));
+
+            var text = val;
+            if (text.length > 10) {
+                text = val.substr(0, 10) + '...';
+            }
+            $('.list-group-item.active .resource-tier').text(htmlDecode(text));
+
             resetSubmitButton($('.update-resource-properties-btn'));
         });
 }
 
 function resetSubmitButton($el) {
     $el.removeClass('disabled').val('Update');
+}
+
+function htmlDecode(inp){
+    var replacements = {'&lt;':'<','&gt;':'>','&sol;':'/','&quot;':'"','&apos;':'\'','&amp;':'&','&laquo;':'«','&raquo;':'»','&nbsp;':' ','&copy;':'©','&reg;':'®','&deg;':'°'};
+    for(var r in replacements){
+        inp = inp.replace(new RegExp(r,'g'),replacements[r]);
+    }
+    return inp.replace(/&#(\d+);/g, function(match, dec) {
+        return String.fromCharCode(dec);
+    });
 }

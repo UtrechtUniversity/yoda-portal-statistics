@@ -25,7 +25,7 @@ class Storage_model extends CI_Model {
 
        if (count($data)) {
            foreach ($data as $resource) {
-               $output[] = array('name' => $resource['resourceName'], 'id' => $resource['resourceId']);
+               $output[] = array('name' => $resource['resourceName'], 'id' => $resource['resourceId'], 'tier' => $resource['org_storageTierName']);
            }
        }
 
