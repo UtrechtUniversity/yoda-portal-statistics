@@ -2,6 +2,6 @@
 
 <div class="row">
     <div class="col-md-12">
-        <p>You are not an Rods Admin</p>
+        <p>You are not a Rods Admin</p>
     </div>
 </div>
