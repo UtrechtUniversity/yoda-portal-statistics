@@ -8,7 +8,7 @@
         <tr>
             <td><?php echo $row['category']; ?></td>
             <td><?php echo $row['tier']; ?></td>
-            <td><?php echo round_up(bytesToGigabytes((int) $row['storage']), 1); ?> GB | <?php echo (int) $row['storage']; ?> bytes</td>
+            <td><?php echo roundUpBytes(bytesToTerabytes((int) $row['storage']), 1); ?> TB | <?php echo (int) $row['storage']; ?> bytes</td>
         </tr>
     <?php } ?>
 </table>
