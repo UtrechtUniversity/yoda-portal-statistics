@@ -59,5 +59,17 @@ class Storage_model extends CI_Model {
 
       return $status;
   }
+
+  function getMonthlyCategoryStorage()
+  {
+      $inputParams = array();
+      $outputParams = array('*result', '*status', '*statusInfo');
+
+      $this->CI->load->library('irodsrule');
+      $rule = $this->irodsrule->make('uuGetMonthlyCategoryStorageOverview', $inputParams, $outputParams);
+
+      $result = $rule->execute();
+      return $result;
+  }
 }
 
