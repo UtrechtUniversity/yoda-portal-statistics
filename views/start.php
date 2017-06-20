@@ -22,15 +22,26 @@
             </div>
         </div>
     </div>
-    <div class="col-md-7 resource-details">
-        <div class="panel panel-default properties">
+    <div class="col-md-7">
+        <div class="resource-details">
+            <div class="panel panel-default properties">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Resource properties</h3>
+                </div>
+                <div class="panel-body">
+                    <p class="placeholder-text">
+                        Please select a resource.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Resource properties</h3>
+                <h3 class="panel-title">Storage</h3>
             </div>
             <div class="panel-body">
-                <p class="placeholder-text">
-                    Please select a resource.
-                </p>
+                <?php echo $storageTable; ?>
             </div>
         </div>
     </div>

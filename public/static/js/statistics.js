@@ -89,7 +89,7 @@ function editTier(resource, val)
     $.post( YodaPortal.baseUrl + 'statistics/edit_tier', { resource: resource, value: val, csrf_yoda: tokenValue})
         .done(function( data ) {
             var data = $.parseJSON(data);
-            if (data.status == 'SUCCESS') {
+            if (data.status == 'Success') {
                 $('#messages').html('<div class="alert alert-success"><button class="close" data-dismiss="alert"><span>×</span></button><p>Updated  ' + resource + ' properties.</p></div>');
             } else {
                 $('#messages').html('<div class="alert alert-danger"><button class="close" data-dismiss="alert"><span>×</span></button><p>Could not update ' + resource + ' properties  due to an internal error.</p></div>');

@@ -48,6 +48,12 @@ class Statistics extends MY_Controller
 
         $this->data['resources'] = $this->Storage_model->getResources();
 
+        // Storage table
+        $this->load->helper('bytes');
+        $storageData = $this->Storage_model->getMonthlyCategoryStorage();
+        $storageTableData = array('data' => $storageData['*result']);
+        $storageTable = $this->load->view('storage_table', $storageTableData, true);
+        $this->data['storageTable'] = $storageTable;
 
         $this->load->view('start', $this->data);
         $this->load->view('common-end');

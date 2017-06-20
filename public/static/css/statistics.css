@@ -91,3 +91,7 @@ i.form-control-feedback.glyphicon {
 .tier-select {
     width: 300px;
 }
+
+.storage-table {
+    margin-bottom: 0px!important;
+}
