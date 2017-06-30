@@ -23,5 +23,19 @@ class User_model extends CI_Model {
 
         return $result['*userType'];
     }
+
+    function isDatamanager()
+    {
+        $account = $this->CI->rodsuser->getRodsAccount();
+        $inputParams = array();
+        $outputParams = array('*isDatamanager', '*status', '*statusInfo');
+
+        $this->CI->load->library('irodsrule');
+        $rule = $this->irodsrule->make('uuUserIsDatamanager', $inputParams, $outputParams);
+        $result = $rule->execute();
+
+        return $result['*isDatamanager'];
+
+    }
 }
 
