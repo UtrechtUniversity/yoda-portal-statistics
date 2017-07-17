@@ -37,9 +37,9 @@
 | in the URL cannot be matched to a valid route.
 |
 */
-$route['default_controller'] 		= $module;
+$module = 'statistics';
 
-$route[$module] 				= $module . "/statistics";
+$route[$module]                        = $module;
 
 /* End of file routes.php */
 /* Location: ./application/config/routes.php */

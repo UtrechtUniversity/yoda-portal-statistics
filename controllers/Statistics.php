@@ -18,8 +18,6 @@ class Statistics extends MY_Controller
         $this->load->model('Storage_model');
         $this->load->model('User_model');
         $this->load->model('Tier_model');
-
-        $this->load->library('module', array(__DIR__));
         $this->load->library('pathlibrary');
 
         // check rights
@@ -34,19 +32,6 @@ class Statistics extends MY_Controller
 
     public function index()
     {
-        $this->load->view('common-start', array(
-            'styleIncludes' => array(
-                'lib/font-awesome/css/font-awesome.css',
-                'css/statistics.css',
-            ),
-            'scriptIncludes' => array(
-                'js/statistics.js'
-            ),
-            'activeModule'   => $this->module->name(),
-            'user' => array(
-                'username' => $this->rodsuser->getUsername(),
-            ),
-        ));
 
         $userType = $this->User_model->getType();
         $isDatamanager = $this->User_model->isDatamanager();
@@ -54,17 +39,19 @@ class Statistics extends MY_Controller
         if ($userType == 'rodsadmin') {
             $isRodsAdmin = 'yes';
         }
-        $this->data['isRodsAdmin'] = $isRodsAdmin;
-        $this->data['isDatamanager'] = $isDatamanager;
+
+        $storageTableAdmin = false;
+        $storageTableDatamanager = false;
+        $resources = false;
 
         // Storage table for rods admin
         $this->load->helper('bytes');
         if ($isRodsAdmin) {
-            $this->data['resources'] = $this->Storage_model->getResources();
+            $resources = $this->Storage_model->getResources();
             $storageData = $this->Storage_model->getMonthlyCategoryStorage();
             $storageTableData = array('data' => $storageData['*result']);
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
-            $this->data['storageTableAdmin'] = $storageTable;
+            $storageTableAdmin = $storageTable;
         }
 
         // Storage table for datamanager
@@ -72,11 +59,21 @@ class Statistics extends MY_Controller
             $storageData = $this->Storage_model->getMonthlyCategoryStorageDatamanager();
             $storageTableData = array('data' => $storageData['*result']);
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
-            $this->data['storageTableDatamanager'] = $storageTable;
+            $storageTableDatamanager = $storageTable;
         }
 
-        $this->load->view('start', $this->data);
-        $this->load->view('common-end');
+        $viewParams = array(
+            'styleIncludes' => array('css/statistics.css'),
+            'scriptIncludes' => array('js/statistics.js'),
+            'activeModule'   => 'statistics',
+            'isDatamanager'  => $isDatamanager,
+            'isRodsAdmin'  => $isDatamanager,
+            'storageTableAdmin' => $storageTableAdmin,
+            'storageTableDatamanager' => $storageTableDatamanager,
+            'resources' => $resources
+        );
+
+        loadView('start', $viewParams);
     }
 
     public function resource_details()
@@ -110,22 +107,13 @@ class Statistics extends MY_Controller
 
     public function not_allowed()
     {
-        $this->load->view('common-start', array(
-            'styleIncludes' => array(
-                'lib/font-awesome/css/font-awesome.css',
-                'css/statistics.css',
-            ),
-            'scriptIncludes' => array(
-                'js/statistics.js'
-            ),
-            'activeModule'   => $this->module->name(),
-            'user' => array(
-                'username' => $this->rodsuser->getUsername(),
-            ),
-        ));
+        $viewParams = array(
+            'styleIncludes' => array('css/statistics.css'),
+            'scriptIncludes' => array('js/statistics.js'),
+            'activeModule'   => 'statistics',
+        );
 
-        $this->load->view('not_allowed', $this->data);
-        $this->load->view('common-end');
+        loadView('not_allowed', $viewParams);
     }
 
 }

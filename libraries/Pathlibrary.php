@@ -19,12 +19,12 @@ class PathLibrary {
      *                          the pathstart, if the path is a valid collection.
      *                          Error code otherwise
      */
-	public function getPathSegments($rodsaccount, $pathStart, $path, &$dir) {
+    public function getPathSegments($rodsaccount, $pathStart, $path, &$dir) {
         $studyIDBegin = strpos(
             $path,
             $pathStart
         );
-        
+
         if($studyIDBegin !== 0) {
             // error
             // echo "Not a valid intake folder";
@@ -34,37 +34,37 @@ class PathLibrary {
                 $dir = new ProdsDir($rodsaccount, $path, true);
 
                 return explode("/", substr($path, strlen($pathStart)));
-               
+
 
             } catch(RODSException $e) {
                 return NO_DIRECTORY;
             }
         }
-	}
+    }
 
     /**
      * Method that returns the pathstart based on the rods server zone
      * and the intake prefix both defined in config/config.php
-     * 
+     *
      * @param config        Reference to config array, as it is not
      *                      available in library context
      * @return string       String containing path start up to and
      *                      including the intake prefix
      */
-	public function getPathStart($config) {
-		/*
-	    return sprintf(
-                "/%s/home/%s", 
-                $config->item('rodsServerZone'), 
+    public function getPathStart($config) {
+        /*
+        return sprintf(
+                "/%s/home/%s",
+                $config->item('rodsServerZone'),
                 $config->item('intake-prefix')
             );
-		*/
+        */
 
         return sprintf(
             "/%s/home",
             $config->item('rodsServerZone')
         );
-	}
+    }
 
     /**
      * Method to find the level definitions as defined in the level hierarchy
