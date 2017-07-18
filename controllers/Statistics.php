@@ -67,7 +67,7 @@ class Statistics extends MY_Controller
             'scriptIncludes' => array('js/statistics.js'),
             'activeModule'   => 'statistics',
             'isDatamanager'  => $isDatamanager,
-            'isRodsAdmin'  => $isDatamanager,
+            'isRodsAdmin'  => $isRodsAdmin,
             'storageTableAdmin' => $storageTableAdmin,
             'storageTableDatamanager' => $storageTableDatamanager,
             'resources' => $resources
