@@ -79,7 +79,7 @@ class Irodsrule
             return $output;
 
         } catch(RODSException $e) {
-            print_r($e);
+            #print_r($e);
             exit;
         }
     }

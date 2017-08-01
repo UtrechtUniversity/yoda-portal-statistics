@@ -25,7 +25,9 @@ class Statistics extends MY_Controller
         // check rights
         $method = $this->router->fetch_method();
         $userType = $this->User_model->getType();
-        if ($userType != 'rodsadmin' && $method != 'not_allowed') {
+        $isDatamanager = $this->User_model->isDatamanager();
+
+        if (($userType != 'rodsadmin' && $isDatamanager != 'yes') && $method != 'not_allowed') {
             return redirect('statistics/not_allowed');
         }
     }
@@ -46,14 +48,32 @@ class Statistics extends MY_Controller
             ),
         ));
 
-        $this->data['resources'] = $this->Storage_model->getResources();
+        $userType = $this->User_model->getType();
+        $isDatamanager = $this->User_model->isDatamanager();
+        $isRodsAdmin = 'no';
+        if ($userType == 'rodsadmin') {
+            $isRodsAdmin = 'yes';
+        }
+        $this->data['isRodsAdmin'] = $isRodsAdmin;
+        $this->data['isDatamanager'] = $isDatamanager;
 
-        // Storage table
+        // Storage table for rods admin
         $this->load->helper('bytes');
-        $storageData = $this->Storage_model->getMonthlyCategoryStorage();
-        $storageTableData = array('data' => $storageData['*result']);
-        $storageTable = $this->load->view('storage_table', $storageTableData, true);
-        $this->data['storageTable'] = $storageTable;
+        if ($isRodsAdmin) {
+            $this->data['resources'] = $this->Storage_model->getResources();
+            $storageData = $this->Storage_model->getMonthlyCategoryStorage();
+            $storageTableData = array('data' => $storageData['*result']);
+            $storageTable = $this->load->view('storage_table', $storageTableData, true);
+            $this->data['storageTableAdmin'] = $storageTable;
+        }
+
+        // Storage table for datamanager
+        if ($isDatamanager) {
+            $storageData = $this->Storage_model->getMonthlyCategoryStorageDatamanager();
+            $storageTableData = array('data' => $storageData['*result']);
+            $storageTable = $this->load->view('storage_table', $storageTableData, true);
+            $this->data['storageTableDatamanager'] = $storageTable;
+        }
 
         $this->load->view('start', $this->data);
         $this->load->view('common-end');

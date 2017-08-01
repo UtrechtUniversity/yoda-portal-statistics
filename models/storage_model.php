@@ -25,7 +25,7 @@ class Storage_model extends CI_Model {
 
        if (count($data)) {
            foreach ($data as $resource) {
-               $output[] = array('name' => $resource['resourceName'], 'id' => $resource['resourceId'], 'tier' => $resource['org_storageTierName']);
+               $output[] = array('name' => $resource['resourceName'], 'id' => $resource['resourceId'], 'tier' => $resource['org_storage_tier']);
            }
        }
 
@@ -43,7 +43,7 @@ class Storage_model extends CI_Model {
       $result = $rule->execute();
       $data = $result['*data'];
 
-      return array('resourceName' => $data['resourceName'], 'resourceTier' => $data['org_storageTierName']);
+      return array('resourceName' => $data['resourceName'], 'resourceTier' => $data['org_storage_tier']);
   }
 
   function setResourceTier($resource, $value)
@@ -71,5 +71,17 @@ class Storage_model extends CI_Model {
       $result = $rule->execute();
       return $result;
   }
+
+    function getMonthlyCategoryStorageDatamanager()
+    {
+        $inputParams = array();
+        $outputParams = array('*result', '*status', '*statusInfo');
+
+        $this->CI->load->library('irodsrule');
+        $rule = $this->irodsrule->make('uuGetMonthlyCategoryStorageOverviewDatamanager', $inputParams, $outputParams);
+
+        $result = $rule->execute();
+        return $result;
+    }
 }
 

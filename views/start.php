@@ -1,6 +1,7 @@
 <h1>Statistics</h1>
 
 <div class="row">
+    <?php if ($isRodsAdmin == 'yes') { ?>
     <div class="col-md-5">
         <div class="panel panel-default resources">
             <div class="panel-heading clearfix">
@@ -22,7 +23,9 @@
             </div>
         </div>
     </div>
+    <?php } ?>
     <div class="col-md-7">
+        <?php if ($isRodsAdmin == 'yes') { ?>
         <div class="resource-details">
             <div class="panel panel-default properties">
                 <div class="panel-heading">
@@ -38,11 +41,23 @@
 
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Storage</h3>
+                <h3 class="panel-title">Storage (RodsAdmin)</h3>
             </div>
             <div class="panel-body">
-                <?php echo $storageTable; ?>
+                <?php echo $storageTableAdmin; ?>
             </div>
         </div>
+        <?php } ?>
+
+        <?php if ($isDatamanager == 'yes') { ?>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Storage (Datamanager)</h3>
+            </div>
+            <div class="panel-body">
+                <?php echo $storageTableDatamanager; ?>
+            </div>
+        </div>
+        <?php } ?>
     </div>
 </div>
