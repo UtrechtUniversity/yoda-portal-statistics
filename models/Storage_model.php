@@ -83,5 +83,51 @@ class Storage_model extends CI_Model {
         $result = $rule->execute();
         return $result;
     }
+
+
+    // Get list of all groups a user is entitled to
+    function getGroupsOfCurrentUser($iRodsAccount)
+    {
+        return array('research-initial', );
+    }
+
+    // Per tier, per month get a full twelve months of storage data for the group
+    // taken from last month up until 12 months back
+    function getFullYearDataForGroupPerTierPerMonth($iRodsAccount, $groupName)
+    {
+        $tierData1 = array(
+            '08' => 10.1,
+            '07' => 9.1,
+            '06' => 9.0,
+            '05' => 8.5,
+            '04' => 8.0,
+            '03' => 10.1,
+            '02' => 20.0,
+            '01' => 1.0,
+            '12' => 7.6,
+            '11' => 6.6,
+            '10' => 4.0,
+            '09' => 3.2,
+        );
+        $tierData2 = array(
+            '08' => 30.1,
+            '07' => 20.1,
+            '06' => 19.0,
+            '05' => 13.5,
+            '04' => 8.0,
+            '03' => 0.1,
+            '02' => 0.0,
+            '01' => 0.0,
+            '12' => 0.0,
+            '11' => 0.0,
+            '10' => 0.0,
+            '09' => 0.0,
+        );
+
+        return array(
+            'tier 1' => $tierData1,
+            'tier 2' => $tierData2
+        );
+    }
 }
 
