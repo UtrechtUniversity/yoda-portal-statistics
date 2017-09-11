@@ -71,16 +71,100 @@ class Storage_model extends CI_Model {
       $result = $rule->execute();
       return $result;
   }
-
-    function getMonthlyCategoryStorageDatamanager()
+    // Get list of all groups a user is entitled to
+    function getGroupsOfCurrentUser()
     {
         $inputParams = array();
-        $outputParams = array('*result', '*status', '*statusInfo');
+        $outputParams = array('*data', '*status', '*statusInfo');
 
         $this->CI->load->library('irodsrule');
-        $rule = $this->irodsrule->make('uuGetMonthlyCategoryStorageOverviewDatamanager', $inputParams, $outputParams);
+        $rule = $this->irodsrule->make('uuFrontEndGetUserGroupsForStatistics', $inputParams, $outputParams);
 
         $result = $rule->execute();
+
+        if ($result['*status'] == 'Success') { // Bring list back to only research groups
+            $allResearchGroups = array();
+            foreach($result['*data'] as $group) {
+                if (substr($group,0,strlen('research-'))=='research-') {
+                    $allResearchGroups[] = $group;
+                }
+            }
+            return array('*status' => $result['*status'],
+                '*statusInfo' => $result['*statusInfo'],
+                '*data' => $allResearchGroups
+            );
+        }
+
+        return $result;
+    }
+
+    // Per tier, per month get a full twelve months of storage data for the group
+    // taken from last month up until 12 months back
+    function getFullYearDataForGroupPerTierPerMonth($groupName)
+    {
+        $currentMonth = date('m');
+        $inputParams = array('*groupName'=>$groupName, '*currentMonth' => $currentMonth);
+        $outputParams = array('*data', '*status', '*statusInfo');
+
+        $this->CI->load->library('irodsrule');
+        $rule = $this->irodsrule->make('uuFrontEndGetYearStatisticsForGroup', $inputParams, $outputParams);
+
+        $result = $rule->execute();
+
+        if ($result['*status'] == 'Success') {
+            $tiers = array(); // to build seperated lists with tiers as a basis
+            $receivedData = array();
+            $fullYearData = array();
+            $totalStorage = 0;
+
+            foreach($result['*data'] as $data) {
+                foreach($data as $key=>$storage) {
+                    // key contains month & tiername -> decipher
+                    // month=12-tier=blabla
+                    $parts = explode('-tier=', $key);
+                    $monthParts = explode('=', $parts[0]);
+                    $month = $monthParts[1];
+                    $tier = $parts[1];
+
+                    // Build a list of tiers that come by in statistics
+                    if(!in_array($tier, $tiers)) {
+                        $tiers[] = $tier;
+                    }
+                }
+                $receivedData[$tier][$month] = $storage;
+                $totalStorage += $storage;
+            }
+            // Build an array with all months present and separated by tiers as
+            // Step back in time
+            foreach ($tiers as $tier){
+                for ($i=0; $i<12; $i++) {
+                    $storageMonth = $currentMonth - $i;
+                    if($storageMonth<1) {
+                        $storageMonth += 12;
+                    }
+                    $monthsOrder[] = $storageMonth;
+                    $fullYearData[$tier][$storageMonth] = isset($receivedData[$tier][$storageMonth]) ? $receivedData[$tier][$storageMonth] : 0;
+                }
+            }
+
+            // supporting info for the frontend
+            $monthsOrder = array();
+            for ($i=0; $i<12; $i++) {
+                $storageMonth = $currentMonth - $i;
+                if ($storageMonth < 1) {
+                    $storageMonth += 12;
+                }
+                $monthsOrder[] = $storageMonth;
+            }
+            return array('*status' => $result['*status'],
+                '*statusInfo' => $result['*statusInfo'],
+                '*data' => array( 'tiers' => $fullYearData,
+                    'months' => $monthsOrder,
+                    'totalStorage' => $totalStorage
+                )
+            );
+        }
+
         return $result;
     }
 }

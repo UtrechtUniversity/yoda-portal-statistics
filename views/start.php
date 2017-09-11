@@ -61,3 +61,40 @@
         <?php } ?>
     </div>
 </div>
+
+<?php if ($isResearcher == 'yes') { ?>
+<div class="row">
+    <div class="col-md-5">
+        <div class="panel panel-default resources">
+            <div class="panel-heading clearfix">
+                <h3 class="panel-title pull-left">Groups</h3>
+            </div>
+            <div class="list-group" id="groups-list">
+                <?php foreach ($groups as $name) { ?>
+                    <div class="list-group">
+                        <a class="list-group-item group" data-name="<?php echo $name; ?>">
+                            <?php echo $name; ?>
+                        </a>
+                    </div>
+                <?php } ?>
+            </div>
+            <div class="panel-footer clearfix">
+            </div>
+        </div>
+    </div>
+    <div class="col-md-7">
+        <div class="group-details">
+            <div class="panel panel-default properties">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Group</h3>
+                </div>
+                <div class="panel-body">
+                    <p class="placeholder-text">
+                        Please select a group.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<?php } ?>
