@@ -50,50 +50,63 @@ function getGroupDetails(group)
 
             $('.group-details').html(data.html);
 
-            var ctx = $('.storage-data');
-            var datasets = [];
-            var labels = [];
+            if (data.storageData.totalStorage > 0) {
+                var ctx = $('.storage-data');
+                var datasets = [];
+                var labels = [];
 
-            $.each(data.storageData.tiers, function( name, storageData ) {
+                $.each(data.storageData.tiers, function (name, storageData) {
 
-                var storageChartData = [];
-                $.each(data.storageData.months, function( index, month ) {
-                    if ( $.inArray(month, labels) === -1) {
-                        labels.push(month);
-                    }
+                    var storageChartData = [];
+                    $.each(data.storageData.months, function (index, month) {
+                        if ($.inArray(month, labels) === -1) {
+                            labels.push(month);
+                        }
 
-                    storageChartData.push(storageData[month]);
+                        storageChartData.push(storageData[month]);
+                    });
+
+                    var tierObject = {
+                        label: name,
+                        data: storageChartData,
+                        backgroundColor: randomColorGenerator()
+                    };
+
+                    datasets.push(tierObject);
                 });
 
-                var tierObject = {
-                    label: name,
-                    data: storageChartData,
-                    backgroundColor: randomColorGenerator()
+                var chartData = {
+                    labels: labels,
+                    datasets: datasets,
                 };
 
-                datasets.push(tierObject);
-            });
+                var chartOptions = {
+                    scales: {
 
-            var chartData = {
-                labels: labels,
-                datasets: datasets,
-            };
+                        xAxes: [{
+                            barPercentage: 1,
+                            categoryPercentage: 0.6,
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Months'
+                            }
+                        }],
 
-            var chartOptions = {
-                scales: {
+                        yAxes: [{
+                            scaleLabel: {
+                                display: true,
+                                labelString: 'Bytes'
+                            }
+                        }]
+                    }
+                };
 
-                    xAxes: [{
-                        barPercentage: 1,
-                        categoryPercentage: 0.6
-                    }],
-                }
-            };
-
-            var chart = new Chart(ctx, {
-                type: 'bar',
-                data: chartData,
-                options: chartOptions
-            });
+                var chart = new Chart(ctx, {
+                    type: 'bar',
+                    data: chartData,
+                    options: chartOptions
+                });
+            }
         }
     });
 }

@@ -36,7 +36,6 @@ class Statistics extends MY_Controller
 
     public function index()
     {
-
         $userType = $this->User_model->getType();
         $isDatamanager = $this->User_model->isDatamanager();
         $isRodsAdmin = 'no';
@@ -54,7 +53,7 @@ class Statistics extends MY_Controller
 
         // Storage table for rods admin
         $this->load->helper('bytes');
-        if ($isRodsAdmin) {
+        if ($isRodsAdmin == 'yes') {
             $resources = $this->Storage_model->getResources();
             $storageData = $this->Storage_model->getMonthlyCategoryStorage();
             $storageTableData = array('data' => $storageData['*result']);
@@ -63,7 +62,7 @@ class Statistics extends MY_Controller
         }
 
         // Storage table for datamanager
-        if ($isDatamanager) {
+        if ($isDatamanager == 'yes') {
             $storageData = $this->Storage_model->getMonthlyCategoryStorageDatamanager();
             $storageTableData = array('data' => $storageData['*result']);
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
@@ -72,10 +71,11 @@ class Statistics extends MY_Controller
 
         // Researcher - get group data.
         $groups = array();
-        if ($isResearcher) {
+        if ($isResearcher == 'yes') {
             $result = $this->Storage_model->getGroupsOfCurrentUser();
             $groups = $result['*data'];
         }
+
 
         $viewParams = array(
             'styleIncludes' => array('css/statistics.css'),
@@ -111,10 +111,10 @@ class Statistics extends MY_Controller
     {
         $groupName = $this->input->get('group');
         $storageData = $this->Storage_model->getFullYearDataForGroupPerTierPerMonth($groupName);
-        $viewData = array('name' => $groupName);
+        $viewData = array('name' => $groupName, 'storageData' => $storageData['*data']);
         $html = $this->load->view('group_details', $viewData, true);
 
-        echo json_encode(array('status' => 'success', 'html' => $html, 'storageData' => $storageData['*data']), JSON_FORCE_OBJECT);
+        echo json_encode(array('status' => 'success', 'html' => $html, 'storageData' => $storageData['*data']));
     }
 
     public function get_tiers()
