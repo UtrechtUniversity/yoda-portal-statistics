@@ -11,8 +11,8 @@ class Storage_model extends CI_Model {
         $this->CI =& get_instance();
     }
 
-   function getResources()
-   {
+    function getResources()
+    {
        $output = array();
 
        $outputParams = array('*data', '*status', '*statusInfo');
@@ -30,11 +30,11 @@ class Storage_model extends CI_Model {
        }
 
        return $output;
-   }
+    }
 
 
-  function getResource($name)
-  {
+    function getResource($name)
+    {
       $inputParams = array('*resourceName' => $name);
       $outputParams = array('*data', '*status', '*statusInfo');
 
@@ -44,10 +44,10 @@ class Storage_model extends CI_Model {
       $data = $result['*data'];
 
       return array('resourceName' => $data['resourceName'], 'resourceTier' => $data['org_storage_tier']);
-  }
+    }
 
-  function setResourceTier($resource, $value)
-  {
+    function setResourceTier($resource, $value)
+    {
 
       $inputParams = array('*resourceName' => $resource, '*tierName' => $value);
       $outputParams = array('*data', '*status', '*statusInfo');
@@ -58,10 +58,10 @@ class Storage_model extends CI_Model {
       $status = $result['*status'];
 
       return $status;
-  }
+    }
 
-  function getMonthlyCategoryStorage()
-  {
+    function getMonthlyCategoryStorage()
+    {
       $inputParams = array();
       $outputParams = array('*result', '*status', '*statusInfo');
 
@@ -70,7 +70,20 @@ class Storage_model extends CI_Model {
 
       $result = $rule->execute();
       return $result;
-  }
+    }
+
+    function getMonthlyCategoryStorageDatamanager()
+    {
+        $inputParams = array();
+        $outputParams = array('*result', '*status', '*statusInfo');
+
+        $this->CI->load->library('irodsrule');
+        $rule = $this->irodsrule->make('uuGetMonthlyCategoryStorageOverviewDatamanager', $inputParams, $outputParams);
+
+        $result = $rule->execute();
+        return $result;
+    }
+
     // Get list of all groups a user is entitled to
     function getGroupsOfCurrentUser()
     {
@@ -168,4 +181,3 @@ class Storage_model extends CI_Model {
         return $result;
     }
 }
-
