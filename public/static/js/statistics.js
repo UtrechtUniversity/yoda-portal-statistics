@@ -3,11 +3,21 @@ $(document).ready(function() {
         makeItemActive($(this));
         getDetails($(this).attr('data-name'));
     });
+
+    $(".list-group-item.group").click(function() {
+        makeItemActive($(this));
+        getGroupDetails($(this).attr('data-name'));
+    });
 });
 
 function makeItemActive(currentItem)
 {
-    $('.list-group-item.resource').removeClass('active');
+    if ($(currentItem).hasClass('resource')) {
+        $('.list-group-item.resource').removeClass('active');
+    } else if ($(currentItem).hasClass('group')) {
+        $('.list-group-item.group').removeClass('active');
+    }
+
     $(currentItem).addClass('active');
 }
 
@@ -31,6 +41,66 @@ function getDetails(resource)
         }
     });
 }
+
+function getGroupDetails(group)
+{
+    var url = "statistics/group_details?group=" + encodeURIComponent(group);
+    $.getJSON(url, function( data ) {
+        if (data.status == 'success') {
+
+            $('.group-details').html(data.html);
+
+            var ctx = $('.storage-data');
+            var datasets = [];
+            var labels = [];
+
+            $.each(data.storageData.tiers, function( name, storageData ) {
+
+                var storageChartData = [];
+                $.each(data.storageData.months, function( index, month ) {
+                    if ( $.inArray(month, labels) === -1) {
+                        labels.push(month);
+                    }
+
+                    storageChartData.push(storageData[month]);
+                });
+
+                var tierObject = {
+                    label: name,
+                    data: storageChartData,
+                    backgroundColor: randomColorGenerator()
+                };
+
+                datasets.push(tierObject);
+            });
+
+            var chartData = {
+                labels: labels,
+                datasets: datasets,
+            };
+
+            var chartOptions = {
+                scales: {
+
+                    xAxes: [{
+                        barPercentage: 1,
+                        categoryPercentage: 0.6
+                    }],
+                }
+            };
+
+            var chart = new Chart(ctx, {
+                type: 'bar',
+                data: chartData,
+                options: chartOptions
+            });
+        }
+    });
+}
+
+var randomColorGenerator = function () {
+    return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+};
 
 function select2Tier()
 {
