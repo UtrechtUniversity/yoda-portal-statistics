@@ -143,9 +143,9 @@ class Storage_model extends CI_Model {
                     if(!in_array($tier, $tiers)) {
                         $tiers[] = $tier;
                     }
+                    $receivedData[$tier][$month] = $storage;
+                    $totalStorage += $storage;
                 }
-                $receivedData[$tier][$month] = $storage;
-                $totalStorage += $storage;
             }
             // Build an array with all months present and separated by tiers as
             // Step back in time
@@ -155,7 +155,6 @@ class Storage_model extends CI_Model {
                     if($storageMonth<1) {
                         $storageMonth += 12;
                     }
-                    $monthsOrder[] = $storageMonth;
                     $fullYearData[$tier][$storageMonth] = isset($receivedData[$tier][$storageMonth]) ? $receivedData[$tier][$storageMonth] : 0;
                 }
             }
