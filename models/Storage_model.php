@@ -163,10 +163,7 @@ class Storage_model extends CI_Model {
             $monthsOrder = array();
             for ($i=0; $i<12; $i++) {
                 $storageMonth = $currentMonth - $i;
-                if ($storageMonth < 1) {
-                    $storageMonth += 12;
-                }
-                $monthsOrder[] = $storageMonth;
+                $monthsOrder[11-$i] = ( ($storageMonth)<1?($storageMonth+12):$storageMonth  ); // reverse the order of months
             }
             return array('*status' => $result['*status'],
                 '*statusInfo' => $result['*statusInfo'],
