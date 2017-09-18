@@ -109,9 +109,16 @@ class Statistics extends MY_Controller
 
     public function group_details()
     {
+        $this->config->load('config');
+        $chartShowStorage = $this->config->item('chartShowStorage');
+        $showStorage = 'Bytes';
+        if ($chartShowStorage == 'TB') {
+            $showStorage = 'Terabytes';
+        }
+
         $groupName = $this->input->get('group');
         $storageData = $this->Storage_model->getFullYearDataForGroupPerTierPerMonth($groupName);
-        $viewData = array('name' => $groupName, 'storageData' => $storageData['*data']);
+        $viewData = array('name' => $groupName, 'storageData' => $storageData['*data'], 'showStorage' => $showStorage);
         $html = $this->load->view('group_details', $viewData, true);
 
         echo json_encode(array('status' => 'success', 'html' => $html, 'storageData' => $storageData['*data']));

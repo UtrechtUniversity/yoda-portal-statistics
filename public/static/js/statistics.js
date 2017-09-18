@@ -95,7 +95,25 @@ function getGroupDetails(group)
                         yAxes: [{
                             scaleLabel: {
                                 display: true,
-                                labelString: 'Bytes'
+                                labelString: $('canvas').data('storage'),
+                            },
+                            /*
+                            ticks: {
+                                fixedStepSize: 1
+                            }
+                            */
+                            ticks: {
+                                min: 0, // it is for ignoring negative step.
+                                beginAtZero: true,
+                                callback: function(value, index, values) {
+                                    if ($('canvas').data('storage') == 'Terabytes') {
+                                        if (value.countDecimals() < 2) {
+                                            return value;
+                                        }
+                                    } else {
+                                        return value;
+                                    }
+                                }
                             }
                         }]
                     }
@@ -114,6 +132,11 @@ function getGroupDetails(group)
 var randomColorGenerator = function () {
     return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
 };
+
+Number.prototype.countDecimals = function () {
+    if(Math.floor(this.valueOf()) === this.valueOf()) return 0;
+    return this.toString().split(".")[1].length || 0;
+}
 
 function select2Tier()
 {

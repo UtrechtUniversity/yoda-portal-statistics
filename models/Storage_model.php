@@ -143,6 +143,14 @@ class Storage_model extends CI_Model {
                     if(!in_array($tier, $tiers)) {
                         $tiers[] = $tier;
                     }
+
+                    $this->config->load('config');
+                    $this->load->helper('bytes');
+                    $chartShowStorage = $this->config->item('chartShowStorage');
+                    if ($chartShowStorage == 'TB') {
+                        $storage = roundUpBytes(bytesToTerabytes((int) $storage), 1);
+                    }
+
                     $receivedData[$tier][$month] = $storage;
                     $totalStorage += $storage;
                 }
