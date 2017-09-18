@@ -6,7 +6,7 @@
         <?php if ($storageData['totalStorage'] == 0) { ?>
             <p>No storage information found.</p>
         <?php } else { ?>
-        <canvas class="storage-data" width="400" height="400"></canvas>
+            <canvas data-storage="<?php echo $showStorage; ?>" class="storage-data" width="400" height="400"></canvas>
         <?php } ?>
     </div>
 </div>
