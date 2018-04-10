@@ -69,7 +69,7 @@ function getGroupDetails(group)
                     var tierObject = {
                         label: name,
                         data: storageChartData,
-                        backgroundColor: randomColorGenerator()
+                        backgroundColor: darkColorGenerator()
                     };
 
                     datasets.push(tierObject);
@@ -129,8 +129,13 @@ function getGroupDetails(group)
     });
 }
 
-var randomColorGenerator = function () {
-    return '#' + (Math.random().toString(16) + '0000000').slice(2, 8);
+var darkColorGenerator = function () {
+    var letters = '0123456789'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 10)];
+    }
+    return color;
 };
 
 Number.prototype.countDecimals = function () {
