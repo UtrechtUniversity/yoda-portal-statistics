@@ -13,6 +13,8 @@ class Statistics extends MY_Controller
             $this->config->item('role:reader') => FALSE
         );
 
+        $this->config->load('config');
+
         $this->data['userIsAllowed'] = TRUE;
 
         $this->load->model('Storage_model');
@@ -139,17 +141,33 @@ class Statistics extends MY_Controller
         echo json_encode(array('status' => $result));
     }
 
-    /*
-    public function not_allowed()
+    public function export()
     {
-        $viewParams = array(
-            'styleIncludes' => array('css/statistics.css'),
-            'scriptIncludes' => array('js/statistics.js'),
-            'activeModule'   => 'statistics',
-        );
+        $delimiter = ';';
+        $zone = $this->config->item('rodsServerZone');
 
-        loadView('not_allowed', $viewParams);
+        // create a file pointer connected to the output stream
+        $output = fopen('php://output', 'w');
+
+        // Heading
+        $row = array('instance name (zone)', 'category name', 'tier', 'amount of storage in use in bytes');
+        fputcsv($output, $row, $delimiter);
+
+        $userType = $this->User_model->getType();
+        if ($userType == 'rodsadmin') {
+            $storageData = $this->Storage_model->getMonthlyCategoryStorage();
+
+            foreach ($storageData['*result'] as $row) {
+                $row = array($zone, $row['category'], $row['tier'], $row['storage']);
+                fputcsv($output, $row, $delimiter);
+            }
+
+            // output headers so that the file is downloaded rather than displayed
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename=' . date('Y-m-d') . ' - ' . $zone . '.csv');
+
+            fclose($output);
+        }
     }
-    */
 
 }

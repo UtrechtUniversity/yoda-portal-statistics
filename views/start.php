@@ -45,6 +45,10 @@
             </div>
             <div class="panel-body">
                 <?php echo $storageTableAdmin; ?>
+
+                <a href="<?php echo base_url('statistics/export') ?>" class="btn btn-primary btn-sm">
+                    Export
+                </a>
             </div>
         </div>
         <?php } ?>
