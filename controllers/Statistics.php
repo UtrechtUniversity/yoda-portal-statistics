@@ -164,7 +164,7 @@ class Statistics extends MY_Controller
 
             // output headers so that the file is downloaded rather than displayed
             header('Content-Type: text/csv; charset=utf-8');
-            header('Content-Disposition: attachment; filename=' . date('Y-m-d') . ' - ' . $zone . '.csv');
+            header('Content-Disposition: attachment; filename="' . date('Y-m-d') . ' - ' . $zone . '.csv"');
 
             fclose($output);
         }
