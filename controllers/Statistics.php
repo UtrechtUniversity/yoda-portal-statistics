@@ -106,7 +106,11 @@ class Statistics extends MY_Controller
         $viewData = array('name' => $information['resourceName'], 'tier' => $information['resourceTier']);
         $html = $this->load->view('detail', $viewData, true);
 
-        echo json_encode(array('status' => 'success', 'html' => $html));
+        $output = array('status' => 'success', 'html' => $html);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($output));
     }
 
     public function group_details()
@@ -122,14 +126,22 @@ class Statistics extends MY_Controller
         $storageData = $this->Storage_model->getFullYearDataForGroupPerTierPerMonth($groupName);
         $viewData = array('name' => $groupName, 'storageData' => $storageData['*data'], 'showStorage' => $showStorage);
         $html = $this->load->view('group_details', $viewData, true);
+        $output = array('status' => 'success',
+	                'html' => $html,
+			'storageData' => $storageData['*data']);
 
-        echo json_encode(array('status' => 'success', 'html' => $html, 'storageData' => $storageData['*data']));
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($output));
     }
 
     public function get_tiers()
     {
         $tiers = $this->Tier_model->listTiers();
-        echo json_encode($tiers);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($tiers));
     }
 
     public function edit_tier()
@@ -138,7 +150,11 @@ class Statistics extends MY_Controller
         $value = $this->input->post('value');
 
         $result = $this->Storage_model->setResourceTier($resource, $value);
-        echo json_encode(array('status' => $result));
+        $output = array('status' => $result);
+
+        $this->output
+            ->set_content_type('application/json')
+            ->set_output(json_encode($output));
     }
 
     public function export()
