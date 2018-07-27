@@ -199,7 +199,6 @@ function editTier(resource, val)
     var tokenValue = YodaPortal.csrf.tokenValue;
     $.post( YodaPortal.baseUrl + 'statistics/edit_tier', { resource: resource, value: val, csrf_yoda: tokenValue})
         .done(function( data ) {
-            var data = $.parseJSON(data);
             if (data.status == 'Success') {
                 $('#messages').html('<div class="alert alert-success"><button class="close" data-dismiss="alert"><span>×</span></button><p>Updated  ' + resource + ' properties.</p></div>');
             } else {
