@@ -130,31 +130,34 @@ class Storage_model extends CI_Model {
             $fullYearData = array();
             $totalStorage = 0;
 
-            foreach($result['*data'] as $data) {
-                foreach($data as $key=>$storage) {
-                    // key contains month & tiername -> decipher
-                    // month=12-tier=blabla
-                    $parts = explode('-tier=', $key);
-                    $monthParts = explode('=', $parts[0]);
-                    $month = $monthParts[1];
-                    $tier = $parts[1];
+            if (is_array($result['*data'])) {
+                foreach($result['*data'] as $data) {
+                    foreach($data as $key=>$storage) {
+                        // key contains month & tiername -> decipher
+                        // month=12-tier=blabla
+                        $parts = explode('-tier=', $key);
+                        $monthParts = explode('=', $parts[0]);
+                        $month = $monthParts[1];
+                        $tier = $parts[1];
 
-                    // Build a list of tiers that come by in statistics
-                    if(!in_array($tier, $tiers)) {
-                        $tiers[] = $tier;
-                    }
+                        // Build a list of tiers that come by in statistics
+                        if(!in_array($tier, $tiers)) {
+                            $tiers[] = $tier;
+                        }
 
-                    $this->config->load('config');
-                    $this->load->helper('bytes');
-                    $chartShowStorage = $this->config->item('chartShowStorage');
-                    if ($chartShowStorage == 'TB') {
-                        $storage = roundUpBytes(bytesToTerabytes((int) $storage), 1);
-                    }
+                        $this->config->load('config');
+                        $this->load->helper('bytes');
+                        $chartShowStorage = $this->config->item('chartShowStorage');
+                        if ($chartShowStorage == 'TB') {
+                            $storage = roundUpBytes(bytesToTerabytes((int) $storage), 1);
+                        }
 
-                    $receivedData[$tier][$month] = $storage;
-                    $totalStorage += $storage;
+                        $receivedData[$tier][$month] = $storage;
+                        $totalStorage += $storage;
+                     }
                 }
             }
+
             // Build an array with all months present and separated by tiers as
             // Step back in time
             foreach ($tiers as $tier){
