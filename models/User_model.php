@@ -1,6 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
-
+/**
+ * User model
+ *
+ * @package    Yoda
+ * @copyright  Copyright (c) 2017-2019, Utrecht University. All rights reserved.
+ * @license    GPLv3, see LICENSE.
+ */
 class User_model extends CI_Model {
 
     var $CI = NULL;
@@ -38,4 +43,3 @@ class User_model extends CI_Model {
 
     }
 }
-
