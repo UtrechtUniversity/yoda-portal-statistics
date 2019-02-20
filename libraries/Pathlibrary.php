@@ -1,5 +1,11 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-
+/**
+ * PathLibrary library
+ *
+ * @package    Yoda
+ * @copyright  Copyright (c) 2017-2019, Utrecht University. All rights reserved.
+ * @license    GPLv3, see LICENSE.
+ */
 define('DIR_NOT_INTAKE', -10);
 define('NO_DIRECTORY', -11);
 
