@@ -27,19 +27,6 @@ class Statistics extends MY_Controller
         $this->load->model('User_model');
         $this->load->model('Tier_model');
         $this->load->library('pathlibrary');
-
-        // check rights
-        /*
-        $method = $this->router->fetch_method();
-        $userType = $this->User_model->getType();
-        $isDatamanager = $this->User_model->isDatamanager();
-        print_r($userType);
-        exit;
-
-        if (($userType != 'rodsadmin' && $isDatamanager != 'yes') && $method != 'not_allowed') {
-            return redirect('statistics/not_allowed');
-        }
-        */
     }
 
     public function index()
@@ -83,7 +70,6 @@ class Statistics extends MY_Controller
             $result = $this->Storage_model->getGroupsOfCurrentUser();
             $groups = $result['*data'];
         }
-
 
         $viewParams = array(
             'styleIncludes' => array('css/statistics.css'),
@@ -132,9 +118,9 @@ class Statistics extends MY_Controller
         $storageData = $this->Storage_model->getFullYearDataForGroupPerTierPerMonth($groupName);
         $viewData = array('name' => $groupName, 'storageData' => $storageData['*data'], 'showStorage' => $showStorage);
         $html = $this->load->view('group_details', $viewData, true);
-        $output = array('status' => 'success',
-	                'html' => $html,
-			'storageData' => $storageData['*data']);
+        $output = array('status'      => 'success',
+                        'html'        => $html,
+                        'storageData' => $storageData['*data']);
 
         $this->output
             ->set_content_type('application/json')
@@ -191,5 +177,4 @@ class Statistics extends MY_Controller
             fclose($output);
         }
     }
-
 }
