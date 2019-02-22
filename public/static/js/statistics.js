@@ -1,3 +1,18 @@
+var months = {
+    1: 'Jan',
+    2: 'Feb',
+    3: 'Mar',
+    4: 'Apr',
+    5: 'May',
+    6: 'Jun',
+    7: 'Jul',
+    8: 'Aug',
+    9: 'Sep',
+    10: 'Oct',
+    11: 'Nov',
+    12: 'Dec'
+};
+
 $(document).ready(function() {
     $(".list-group-item.resource").click(function() {
         makeItemActive($(this));
@@ -60,7 +75,7 @@ function getGroupDetails(group)
                     var storageChartData = [];
                     $.each(data.storageData.months, function (index, month) {
                         if ($.inArray(month, labels) === -1) {
-                            labels.push(month);
+                            labels.push(months[month]);
                         }
 
                         storageChartData.push(storageData[month]);
@@ -97,11 +112,6 @@ function getGroupDetails(group)
                                 display: true,
                                 labelString: $('canvas').data('storage'),
                             },
-                            /*
-                            ticks: {
-                                fixedStepSize: 1
-                            }
-                            */
                             ticks: {
                                 min: 0, // it is for ignoring negative step.
                                 beginAtZero: true,
