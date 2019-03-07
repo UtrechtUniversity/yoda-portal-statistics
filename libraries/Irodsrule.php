@@ -1,11 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-/**
- * Irodsrule library
- *
- * @package    Yoda
- * @copyright  Copyright (c) 2017-2018, Utrecht University. All rights reserved.
- * @license    GPLv3, see LICENSE.
- */
+
 class Irodsrule
 {
     public $CI;
@@ -74,20 +68,19 @@ class Irodsrule
 
             $ruleResult = $this->rule->execute();
             foreach ($this->outputParameters as $parameter) {
-                if (isset($ruleResult[$parameter])) {
-                    $result = json_decode($ruleResult[$parameter], true);
-                    if (empty($result)) {
-                        $output[$parameter] = $ruleResult[$parameter];
-                    } else {
-                        $output[$parameter] = json_decode($ruleResult[$parameter], true);
-                    }
+                $result = json_decode($ruleResult[$parameter], true);
+                if (empty($result)) {
+                    $output[$parameter] = $ruleResult[$parameter];
+                } else {
+                    $output[$parameter] = json_decode($ruleResult[$parameter], true);
                 }
             }
 
             return $output;
 
         } catch(RODSException $e) {
-            return array('*status' => 'error', '*statusInfo' => 'Unexpected error at ' . date('d F Y H:i') . '. Please contact an administrator.');
+            #print_r($e);
+            exit;
         }
     }
 

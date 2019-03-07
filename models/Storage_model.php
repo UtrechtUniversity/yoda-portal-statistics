@@ -1,11 +1,6 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-/**
- * Storage model
- *
- * @package    Yoda
- * @copyright  Copyright (c) 2017-2019, Utrecht University. All rights reserved.
- * @license    GPLv3, see LICENSE.
- */
+
+
 class Storage_model extends CI_Model {
 
     var $CI = NULL;
@@ -16,7 +11,7 @@ class Storage_model extends CI_Model {
         $this->CI =& get_instance();
     }
 
-    function getResources()
+    function getResources()  // DONE
     {
        $output = array();
 
@@ -38,7 +33,7 @@ class Storage_model extends CI_Model {
     }
 
 
-    function getResource($name)
+    function getResource($name) //DONE
     {
       $inputParams = array('*resourceName' => $name);
       $outputParams = array('*data', '*status', '*statusInfo');
@@ -51,7 +46,7 @@ class Storage_model extends CI_Model {
       return array('resourceName' => $data['resourceName'], 'resourceTier' => $data['org_storage_tier']);
     }
 
-    function setResourceTier($resource, $value)
+    function setResourceTier($resource, $value) // LATER
     {
 
       $inputParams = array('*resourceName' => $resource, '*tierName' => $value);
@@ -65,7 +60,7 @@ class Storage_model extends CI_Model {
       return $status;
     }
 
-    function getMonthlyCategoryStorage()
+    function getMonthlyCategoryStorage() # NU ALS rodsADMIN
     {
       $inputParams = array();
       $outputParams = array('*result', '*status', '*statusInfo');
@@ -77,7 +72,7 @@ class Storage_model extends CI_Model {
       return $result;
     }
 
-    function getMonthlyCategoryStorageDatamanager()
+    function getMonthlyCategoryStorageDatamanager() # NU - als datamanager
     {
         $inputParams = array();
         $outputParams = array('*result', '*status', '*statusInfo');
@@ -86,11 +81,14 @@ class Storage_model extends CI_Model {
         $rule = $this->irodsrule->make('uuGetMonthlyCategoryStorageOverviewDatamanager', $inputParams, $outputParams);
 
         $result = $rule->execute();
+
+        //print_r($result); exit;
+
         return $result;
     }
 
     // Get list of all groups a user is entitled to
-    function getGroupsOfCurrentUser()
+    function getGroupsOfCurrentUser() // DONE
     {
         $inputParams = array();
         $outputParams = array('*data', '*status', '*statusInfo');
@@ -116,9 +114,35 @@ class Storage_model extends CI_Model {
         return $result;
     }
 
+    function getGroupsOfCurrentDatamanager()
+    {
+        $inputParams = array();
+        $outputParams = array('*data', '*status', '*statusInfo');
+
+        $this->CI->load->library('irodsrule');
+        $rule = $this->irodsrule->make('uuFrontEndGetUserGroupsForStatisticsDM', $inputParams, $outputParams);
+
+        $result = $rule->execute();
+
+        if ($result['*status'] == 'Success') { // Bring list back to only research groups
+            $allResearchGroups = array();
+            foreach($result['*data'] as $group) {
+                $allResearchGroups[] = $group; // For datamanager show all groups - not limited to research like when a user
+            }
+            return array('*status' => $result['*status'],
+                '*statusInfo' => $result['*statusInfo'],
+                '*data' => $allResearchGroups
+            );
+        }
+
+        return $result;
+    }
+
+
+
     // Per tier, per month get a full twelve months of storage data for the group
     // taken from last month up until 12 months back
-    function getFullYearDataForGroupPerTierPerMonth($groupName)
+    function getFullYearDataForGroupPerTierPerMonth($groupName)     // DONE
     {
         $currentMonth = date('m');
         $inputParams = array('*groupName'=>$groupName, '*currentMonth' => $currentMonth);
@@ -128,7 +152,7 @@ class Storage_model extends CI_Model {
         $rule = $this->irodsrule->make('uuFrontEndGetYearStatisticsForGroup', $inputParams, $outputParams);
 
         $result = $rule->execute();
-
+        
         if ($result['*status'] == 'Success') {
             $tiers = array(); // to build seperated lists with tiers as a basis
             $receivedData = array();
@@ -136,6 +160,8 @@ class Storage_model extends CI_Model {
             $totalStorage = 0;
 
             if (is_array($result['*data'])) {
+                //print_r($result['*data']);exit;
+
                 foreach($result['*data'] as $data) {
                     foreach($data as $key=>$storage) {
                         // key contains month & tiername -> decipher
@@ -182,14 +208,13 @@ class Storage_model extends CI_Model {
                 $monthsOrder[11-$i] = ( ($storageMonth)<1?($storageMonth+12):$storageMonth  ); // reverse the order of months
             }
             return array('*status' => $result['*status'],
-                '*statusInfo' => $result['*statusInfo'],
-                '*data' => array( 'tiers' => $fullYearData,
+                   '*statusInfo' => $result['*statusInfo'],
+                    '*data' => array( 'tiers' => $fullYearData,
                     'months' => $monthsOrder,
                     'totalStorage' => $totalStorage
                 )
             );
         }
-
         return $result;
     }
 }

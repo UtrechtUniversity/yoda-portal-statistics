@@ -66,7 +66,7 @@
     </div>
 </div>
 
-<?php if ($isResearcher == 'yes') { ?>
+<?php if ($isResearcher == 'yes' || $isDatamanager == 'yes') { ?>
 <div class="row">
     <div class="col-md-5">
         <div class="panel panel-default resources">

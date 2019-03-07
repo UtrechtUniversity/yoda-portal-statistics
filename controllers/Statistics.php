@@ -1,11 +1,5 @@
 <?php if ( ! defined('BASEPATH')) exit('No direct script access allowed');
-/**
- * Statistics controller
- *
- * @package    Yoda
- * @copyright  Copyright (c) 2017-2019, Utrecht University. All rights reserved.
- * @license    GPLv3, see LICENSE.
- */
+
 class Statistics extends MY_Controller
 {
     public function __construct()
@@ -27,6 +21,19 @@ class Statistics extends MY_Controller
         $this->load->model('User_model');
         $this->load->model('Tier_model');
         $this->load->library('pathlibrary');
+
+        // check rights
+        /*
+        $method = $this->router->fetch_method();
+        $userType = $this->User_model->getType();
+        $isDatamanager = $this->User_model->isDatamanager();
+        print_r($userType);
+        exit;
+
+        if (($userType != 'rodsadmin' && $isDatamanager != 'yes') && $method != 'not_allowed') {
+            return redirect('statistics/not_allowed');
+        }
+        */
     }
 
     public function index()
@@ -56,20 +63,27 @@ class Statistics extends MY_Controller
             $storageTableAdmin = $storageTable;
         }
 
+        $groups = array();  // used for both datamanager as well as researchers
         // Storage table for datamanager
         if ($isDatamanager == 'yes') {
             $storageData = $this->Storage_model->getMonthlyCategoryStorageDatamanager();
             $storageTableData = array('data' => $storageData['*result']);
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
             $storageTableDatamanager = $storageTable;
+
+            $result = $this->Storage_model->getGroupsOfCurrentDatamanager();
+            $groups = $result['*data'];
+
+            //print_r($groups);exit;
         }
 
         // Researcher - get group data.
-        $groups = array();
-        if ($isResearcher == 'yes') {
+
+        if ($isResearcher == 'yes' && !$isDatamanager) {
             $result = $this->Storage_model->getGroupsOfCurrentUser();
             $groups = $result['*data'];
         }
+
 
         $viewParams = array(
             'styleIncludes' => array('css/statistics.css'),
@@ -118,9 +132,9 @@ class Statistics extends MY_Controller
         $storageData = $this->Storage_model->getFullYearDataForGroupPerTierPerMonth($groupName);
         $viewData = array('name' => $groupName, 'storageData' => $storageData['*data'], 'showStorage' => $showStorage);
         $html = $this->load->view('group_details', $viewData, true);
-        $output = array('status'      => 'success',
-                        'html'        => $html,
-                        'storageData' => $storageData['*data']);
+        $output = array('status' => 'success',
+	                'html' => $html,
+			'storageData' => $storageData['*data']);
 
         $this->output
             ->set_content_type('application/json')
@@ -177,4 +191,5 @@ class Statistics extends MY_Controller
             fclose($output);
         }
     }
+
 }
