@@ -67,6 +67,15 @@
 </div>
 
 <?php if ($isResearcher == 'yes' || $isDatamanager == 'yes') { ?>
+<?php
+    function human_filesize($bytes, $decimals = 2) {
+        $size = array('B','kB','MB','GB','TB','PB','EB','ZB','YB');
+        $factor = floor((strlen($bytes) - 1) / 3);
+        return sprintf("%.{$decimals}f", $bytes / pow(1024, $factor)) . @$size[$factor];
+    }
+?>
+
+
 <div class="row">
     <div class="col-md-5">
         <div class="panel panel-default resources">
@@ -76,9 +85,16 @@
             <div class="list-group" id="groups-list">
                 <?php foreach ($groups as $name) { ?>
                     <div class="list-group">
+                        <?php if ($isDatamanager == 'yes') { // datamanager get to see current storage levels per group ?>
+                            <a class="list-group-item group" data-name="<?php echo $name[0]; ?>">
+                                <?php echo $name[0] . ($name[1]>0 ? (' ('  . human_filesize($name[1]) . ', ' . $name[1] . ')'):''); ?>
+                            </a>
+                        <?php }
+                        else { ?>
                         <a class="list-group-item group" data-name="<?php echo $name; ?>">
                             <?php echo $name; ?>
                         </a>
+                        <?php } ?>
                     </div>
                 <?php } ?>
             </div>

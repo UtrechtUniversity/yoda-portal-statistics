@@ -73,17 +73,14 @@ class Statistics extends MY_Controller
 
             $result = $this->Storage_model->getGroupsOfCurrentDatamanager();
             $groups = $result['*data'];
-
-            //print_r($groups);exit;
         }
-
-        // Researcher - get group data.
-
-        if ($isResearcher == 'yes' && !$isDatamanager) {
-            $result = $this->Storage_model->getGroupsOfCurrentUser();
-            $groups = $result['*data'];
+        else {
+            // Researcher - get group data.
+            if ($isResearcher == 'yes') {
+                $result = $this->Storage_model->getGroupsOfCurrentUser();
+                $groups = $result['*data'];
+            }
         }
-
 
         $viewParams = array(
             'styleIncludes' => array('css/statistics.css'),

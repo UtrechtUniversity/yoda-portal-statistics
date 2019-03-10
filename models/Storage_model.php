@@ -11,7 +11,7 @@ class Storage_model extends CI_Model {
         $this->CI =& get_instance();
     }
 
-    function getResources()  // DONE
+    function getResources()
     {
        $output = array();
 
@@ -33,7 +33,7 @@ class Storage_model extends CI_Model {
     }
 
 
-    function getResource($name) //DONE
+    function getResource($name)
     {
       $inputParams = array('*resourceName' => $name);
       $outputParams = array('*data', '*status', '*statusInfo');
@@ -46,7 +46,7 @@ class Storage_model extends CI_Model {
       return array('resourceName' => $data['resourceName'], 'resourceTier' => $data['org_storage_tier']);
     }
 
-    function setResourceTier($resource, $value) // LATER
+    function setResourceTier($resource, $value)
     {
 
       $inputParams = array('*resourceName' => $resource, '*tierName' => $value);
@@ -60,7 +60,7 @@ class Storage_model extends CI_Model {
       return $status;
     }
 
-    function getMonthlyCategoryStorage() # NU ALS rodsADMIN
+    function getMonthlyCategoryStorage()
     {
       $inputParams = array();
       $outputParams = array('*result', '*status', '*statusInfo');
@@ -72,7 +72,7 @@ class Storage_model extends CI_Model {
       return $result;
     }
 
-    function getMonthlyCategoryStorageDatamanager() # NU - als datamanager
+    function getMonthlyCategoryStorageDatamanager()
     {
         $inputParams = array();
         $outputParams = array('*result', '*status', '*statusInfo');
@@ -88,7 +88,7 @@ class Storage_model extends CI_Model {
     }
 
     // Get list of all groups a user is entitled to
-    function getGroupsOfCurrentUser() // DONE
+    function getGroupsOfCurrentUser()
     {
         $inputParams = array();
         $outputParams = array('*data', '*status', '*statusInfo');
@@ -105,6 +105,7 @@ class Storage_model extends CI_Model {
                     $allResearchGroups[] = $group;
                 }
             }
+
             return array('*status' => $result['*status'],
                 '*statusInfo' => $result['*statusInfo'],
                 '*data' => $allResearchGroups
@@ -114,6 +115,7 @@ class Storage_model extends CI_Model {
         return $result;
     }
 
+    //@todo do we have to limit the groups based upon research or not???
     function getGroupsOfCurrentDatamanager()
     {
         $inputParams = array();
@@ -129,6 +131,7 @@ class Storage_model extends CI_Model {
             foreach($result['*data'] as $group) {
                 $allResearchGroups[] = $group; // For datamanager show all groups - not limited to research like when a user
             }
+
             return array('*status' => $result['*status'],
                 '*statusInfo' => $result['*statusInfo'],
                 '*data' => $allResearchGroups
@@ -142,7 +145,7 @@ class Storage_model extends CI_Model {
 
     // Per tier, per month get a full twelve months of storage data for the group
     // taken from last month up until 12 months back
-    function getFullYearDataForGroupPerTierPerMonth($groupName)     // DONE
+    function getFullYearDataForGroupPerTierPerMonth($groupName)
     {
         $currentMonth = date('m');
         $inputParams = array('*groupName'=>$groupName, '*currentMonth' => $currentMonth);
@@ -152,7 +155,7 @@ class Storage_model extends CI_Model {
         $rule = $this->irodsrule->make('uuFrontEndGetYearStatisticsForGroup', $inputParams, $outputParams);
 
         $result = $rule->execute();
-        
+
         if ($result['*status'] == 'Success') {
             $tiers = array(); // to build seperated lists with tiers as a basis
             $receivedData = array();
