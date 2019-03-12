@@ -165,15 +165,22 @@ class Statistics extends MY_Controller
         $delimiter = ';';
         $zone = $this->config->item('rodsServerZone');
 
-        // create a file pointer connected to the output stream
-        $output = fopen('php://output', 'w');
-
-        // Heading
-        $row = array('instance name (zone)', 'category name', 'tier', 'amount of storage in use in bytes');
-        fputcsv($output, $row, $delimiter);
-
         $userType = $this->User_model->getType();
         if ($userType == 'rodsadmin') {
+            // create a file pointer connected to the output stream
+            $output = fopen('php://output', 'w');
+
+            // Start output buffering.
+            ob_start();
+
+            // Output headers so that the file is downloaded rather than displayed.
+            header('Content-Type: text/csv; charset=utf-8');
+            header('Content-Disposition: attachment; filename="' . date('Y-m-d') . ' - ' . $zone . '.csv"');
+
+            // CSV heading.
+            $row = array('instance name (zone)', 'category name', 'tier', 'amount of storage in use in bytes');
+            fputcsv($output, $row, $delimiter);
+
             $storageData = $this->Storage_model->getMonthlyCategoryStorage();
 
             foreach ($storageData['*result'] as $row) {
@@ -181,11 +188,10 @@ class Statistics extends MY_Controller
                 fputcsv($output, $row, $delimiter);
             }
 
-            // output headers so that the file is downloaded rather than displayed
-            header('Content-Type: text/csv; charset=utf-8');
-            header('Content-Disposition: attachment; filename="' . date('Y-m-d') . ' - ' . $zone . '.csv"');
-
             fclose($output);
+
+            // Send the output buffer.
+            ob_flush();
         }
     }
 
