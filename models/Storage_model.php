@@ -60,6 +60,25 @@ class Storage_model extends CI_Model {
       return $status;
     }
 
+
+    // Get full year of storage data for datamanager.
+    // -Category
+    // -Subcategory
+    // -Groupname
+    // -Tier
+    // 12 columns, one per month, with used storage count in bytes
+    function getExportDMCategoryStorageFullYear()
+    {
+        $inputParams = array();
+        $outputParams = array('*result', '*status', '*statusInfo');
+
+        $this->CI->load->library('irodsrule');
+        $rule = $this->irodsrule->make('uuGetExportDMCategoryStorageFullYear', $inputParams, $outputParams);
+
+        $result = $rule->execute();
+        return $result;
+    }
+
     function getMonthlyCategoryStorage()
     {
       $inputParams = array();
