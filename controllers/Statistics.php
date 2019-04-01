@@ -160,13 +160,17 @@ class Statistics extends MY_Controller
             ->set_output(json_encode($output));
     }
 
+    // Export of storage information
+    // Differentiation for rodsadmin and datamanager.
     public function export()
     {
         $delimiter = ';';
         $zone = $this->config->item('rodsServerZone');
 
         $userType = $this->User_model->getType();
-        if ($userType == 'rodsadmin') {
+        $isDatamanager = $this->User_model->isDatamanager();
+
+        if ($userType == 'rodsadmin' || $isDatamanager == 'yes') {
             // create a file pointer connected to the output stream
             $output = fopen('php://output', 'w');
 
@@ -177,15 +181,60 @@ class Statistics extends MY_Controller
             header('Content-Type: text/csv; charset=utf-8');
             header('Content-Disposition: attachment; filename="' . date('Y-m-d') . ' - ' . $zone . '.csv"');
 
-            // CSV heading.
-            $row = array('instance name (zone)', 'category name', 'tier', 'amount of storage in use in bytes');
-            fputcsv($output, $row, $delimiter);
-
-            $storageData = $this->Storage_model->getMonthlyCategoryStorage();
-
-            foreach ($storageData['*result'] as $row) {
-                $row = array($zone, $row['category'], $row['tier'], $row['storage']);
+            // Create output header depending on role
+            if ($isDatamanager == 'yes' ) {
+                // CSV heading for datamanager data
+                $row = array('category name', 'subcategory', 'groupname', 'tier',
+                    'Januari', 'Februari', 'March', 'April', 'May', 'June',
+                    'July', 'August', 'September', 'October', 'November', 'December');
                 fputcsv($output, $row, $delimiter);
+
+                $storageData = $this->Storage_model->getExportDMCategoryStorageFullYear();
+                // Process the storage data
+                // COnvert to array in which can be easlily indexed on month
+                $totalData = array();
+                $index = 0;
+                foreach ($storageData['*result'] as $row) {
+                    $category = $row['category'];
+                    $groupName = $row['groupname'];
+                    $subcategory = $row['subcategory'];  // is not a distinguising item but descriptive - add to groupname
+                    $tier = $row['tier'];
+                    $month = $row['month'];  // 01-12
+                    $storage = $row['storage'];
+                    // subcat && groupname can be added together for now to simplify matters here
+                    $totalData[$category][$subcategory . '*' . $groupName][$tier][$month] = $storage;
+                    $index++;
+                }
+
+                // now aggregate where all knoon months for a category/group/tier are assigned to same row.
+                foreach ($totalData as $category => $subCatGroups) {
+                    foreach ($subCatGroups as $subCatGroup => $tiers) {
+                        foreach ($tiers as $tier => $monthStorageData) {
+                            $temp = explode('*', $subCatGroup);
+                            $subCat = $temp[0];
+                            $groupName = $temp[1];
+                            $row = array($category, $subCat, $groupName, $tier);
+
+                            // Add month storages to $row
+                            for ($i = 1; $i <= 12; $i++) {
+                                // Add to initialized row
+                                $row[] = (isset($monthStorageData[$i])? $monthStorageData[$i] : '0' );
+                            }
+                            fputcsv($output, $row, $delimiter);
+                        }
+                    }
+                }
+            }
+            else { // Rodsamin
+                $row = array('instance name (zone)', 'category name', 'tier', 'amount of storage in use in bytes');
+                fputcsv($output, $row, $delimiter);
+
+                $storageData = $this->Storage_model->getMonthlyCategoryStorage();
+
+                foreach ($storageData['*result'] as $row) {
+                    $row = array($zone, $row['category'], $row['tier'], $row['storage']);
+                    fputcsv($output, $row, $delimiter);
+                }
             }
 
             fclose($output);
