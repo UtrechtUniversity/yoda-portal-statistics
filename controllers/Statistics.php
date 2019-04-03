@@ -223,12 +223,6 @@ class Statistics extends MY_Controller
                             $groupName = $temp[1];
                             $row = array($category, $subCat, $groupName, $tier);
 
-                            // Add month storages to $row
-//                            for ($i = 1; $i <= 12; $i++) {
-//                                // Add to initialized row
-//                                $row[] = (isset($monthStorageData[$i])? $monthStorageData[$i] : '0' );
-//                            }
-
                             // Add month storage in proper order
                             for ($i=11; $i>=0; $i--) {
                                 $month = ((($curMonth - $i)<=0) ?  ($curMonth-$i + 12): ($curMonth-$i)  );
