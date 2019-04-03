@@ -184,9 +184,17 @@ class Statistics extends MY_Controller
             // Create output header depending on role
             if ($isDatamanager == 'yes' ) {
                 // CSV heading for datamanager data
-                $row = array('category name', 'subcategory', 'groupname', 'tier',
-                    'Januari', 'Februari', 'March', 'April', 'May', 'June',
+                $row = array('category name', 'subcategory', 'groupname', 'tier');
+                $curMonth = intval(date('m'));
+                $months = array('January', 'February', 'March', 'April', 'May', 'June',
                     'July', 'August', 'September', 'October', 'November', 'December');
+
+                // Add month names in proper order
+                for ($i=11; $i>=0; $i--) {
+                    $month = ((($curMonth - $i)<=0) ?  ($curMonth-$i + 12): ($curMonth-$i)  );
+                    $row[] = $months[$month-1];
+                }
+
                 fputcsv($output, $row, $delimiter);
 
                 $storageData = $this->Storage_model->getExportDMCategoryStorageFullYear();
@@ -216,10 +224,17 @@ class Statistics extends MY_Controller
                             $row = array($category, $subCat, $groupName, $tier);
 
                             // Add month storages to $row
-                            for ($i = 1; $i <= 12; $i++) {
-                                // Add to initialized row
-                                $row[] = (isset($monthStorageData[$i])? $monthStorageData[$i] : '0' );
+//                            for ($i = 1; $i <= 12; $i++) {
+//                                // Add to initialized row
+//                                $row[] = (isset($monthStorageData[$i])? $monthStorageData[$i] : '0' );
+//                            }
+
+                            // Add month storage in proper order
+                            for ($i=11; $i>=0; $i--) {
+                                $month = ((($curMonth - $i)<=0) ?  ($curMonth-$i + 12): ($curMonth-$i)  );
+                                $row[] = (isset($monthStorageData[$month])? $monthStorageData[$month] : '0' );
                             }
+
                             fputcsv($output, $row, $delimiter);
                         }
                     }
