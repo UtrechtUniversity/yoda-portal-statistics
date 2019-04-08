@@ -175,6 +175,7 @@ class Statistics extends MY_Controller
             $output = fopen('php://output', 'w');
 
             // Start output buffering.
+            ob_clean(); // clear the output buffer as now config_local introduces extra line at the moment
             ob_start();
 
             // Output headers so that the file is downloaded rather than displayed.
@@ -247,10 +248,8 @@ class Statistics extends MY_Controller
             }
 
             fclose($output);
-
             // Send the output buffer.
             ob_flush();
         }
     }
-
 }
