@@ -21,19 +21,6 @@ class Statistics extends MY_Controller
         $this->load->model('User_model');
         $this->load->model('Tier_model');
         $this->load->library('pathlibrary');
-
-        // check rights
-        /*
-        $method = $this->router->fetch_method();
-        $userType = $this->User_model->getType();
-        $isDatamanager = $this->User_model->isDatamanager();
-        print_r($userType);
-        exit;
-
-        if (($userType != 'rodsadmin' && $isDatamanager != 'yes') && $method != 'not_allowed') {
-            return redirect('statistics/not_allowed');
-        }
-        */
     }
 
     public function index()
@@ -55,10 +42,14 @@ class Statistics extends MY_Controller
 
         // Storage table for rods admin
         $this->load->helper('bytes');
+        $this->load->library('api');
+
         if ($isRodsAdmin == 'yes') {
-            $resources = $this->Storage_model->getResources();
-            $storageData = $this->Storage_model->getMonthlyCategoryStorage();
-            $storageTableData = array('data' => $storageData['*result']);
+            $result = $this->api->call('uu_resource_resource_and_tier_data');
+            $resources = $result['data'];
+
+            $result = $this->api->call('uu_resource_monthly_stats');
+            $storageTableData = array('data' => $result['data']);
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
             $storageTableAdmin = $storageTable;
         }
@@ -66,13 +57,13 @@ class Statistics extends MY_Controller
         $groups = array();  // used for both datamanager as well as researchers
         // Storage table for datamanager
         if ($isDatamanager == 'yes') {
-            $storageData = $this->Storage_model->getMonthlyCategoryStorageDatamanager();
-            $storageTableData = array('data' => $storageData['*result']);
+            $result = $this->api->call('uu_resource_monthly_stats_dm');
+            $storageTableData = array('data' => $result['data']);
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
             $storageTableDatamanager = $storageTable;
 
-            $result = $this->Storage_model->getGroupsOfCurrentDatamanager();
-            $groups = $result['*data'];
+            $result = $this->api->call('uu_resource_groups_dm');
+            $groups = $result['data'];
         }
         else {
             // Researcher - get group data.
@@ -164,6 +155,8 @@ class Statistics extends MY_Controller
     // Differentiation for rodsadmin and datamanager.
     public function export()
     {
+        $this->load->library('api');
+
         $delimiter = ';';
         $zone = $this->config->item('rodsServerZone');
 
@@ -198,12 +191,13 @@ class Statistics extends MY_Controller
 
                 fputcsv($output, $row, $delimiter);
 
-                $storageData = $this->Storage_model->getExportDMCategoryStorageFullYear();
+                $result = $this->api->call('uu_resource_monthly_category_stats_export_dm');
+
                 // Process the storage data
                 // COnvert to array in which can be easlily indexed on month
                 $totalData = array();
                 $index = 0;
-                foreach ($storageData['*result'] as $row) {
+                foreach ($result['data'] as $row) {
                     $category = $row['category'];
                     $groupName = $row['groupname'];
                     $subcategory = $row['subcategory'];  // is not a distinguising item but descriptive - add to groupname
@@ -239,9 +233,9 @@ class Statistics extends MY_Controller
                 $row = array('instance name (zone)', 'category name', 'tier', 'amount of storage in use in bytes');
                 fputcsv($output, $row, $delimiter);
 
-                $storageData = $this->Storage_model->getMonthlyCategoryStorage();
+                $result = $this->api->call('uu_resource_monthly_stats');
 
-                foreach ($storageData['*result'] as $row) {
+                foreach ($result['data'] as $row) {
                     $row = array($zone, $row['category'], $row['tier'], $row['storage']);
                     fputcsv($output, $row, $delimiter);
                 }

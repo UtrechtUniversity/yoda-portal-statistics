@@ -11,28 +11,6 @@ class Storage_model extends CI_Model {
         $this->CI =& get_instance();
     }
 
-    function getResources()
-    {
-       $output = array();
-
-       $outputParams = array('*data', '*status', '*statusInfo');
-       $inputParams = array();
-
-       $this->CI->load->library('irodsrule');
-       $rule = $this->irodsrule->make('uuFrontEndListResourcesAndStatisticData', $inputParams, $outputParams);
-       $result = $rule->execute();
-       $data = $result['*data'];
-
-       if (count($data)) {
-           foreach ($data as $resource) {
-               $output[] = array('name' => $resource['resourceName'], 'id' => $resource['resourceId'], 'tier' => $resource['org_storage_tier']);
-           }
-       }
-
-       return $output;
-    }
-
-
     function getResource($name)
     {
       $inputParams = array('*resourceName' => $name);
@@ -58,52 +36,6 @@ class Storage_model extends CI_Model {
       $status = $result['*status'];
 
       return $status;
-    }
-
-
-    // Get full year of storage data for datamanager.
-    // -Category
-    // -Subcategory
-    // -Groupname
-    // -Tier
-    // 12 columns, one per month, with used storage count in bytes
-    function getExportDMCategoryStorageFullYear()
-    {
-        $inputParams = array();
-        $outputParams = array('*result', '*status', '*statusInfo');
-
-        $this->CI->load->library('irodsrule');
-        $rule = $this->irodsrule->make('uuGetExportDMCategoryStorageFullYear', $inputParams, $outputParams);
-
-        $result = $rule->execute();
-        return $result;
-    }
-
-    function getMonthlyCategoryStorage()
-    {
-      $inputParams = array();
-      $outputParams = array('*result', '*status', '*statusInfo');
-
-      $this->CI->load->library('irodsrule');
-      $rule = $this->irodsrule->make('uuGetMonthlyCategoryStorageOverview', $inputParams, $outputParams);
-
-      $result = $rule->execute();
-      return $result;
-    }
-
-    function getMonthlyCategoryStorageDatamanager()
-    {
-        $inputParams = array();
-        $outputParams = array('*result', '*status', '*statusInfo');
-
-        $this->CI->load->library('irodsrule');
-        $rule = $this->irodsrule->make('uuGetMonthlyCategoryStorageOverviewDatamanager', $inputParams, $outputParams);
-
-        $result = $rule->execute();
-
-        //print_r($result); exit;
-
-        return $result;
     }
 
     // Get list of all groups a user is entitled to
@@ -133,33 +65,6 @@ class Storage_model extends CI_Model {
 
         return $result;
     }
-
-    //@todo do we have to limit the groups based upon research or not???
-    function getGroupsOfCurrentDatamanager()
-    {
-        $inputParams = array();
-        $outputParams = array('*data', '*status', '*statusInfo');
-
-        $this->CI->load->library('irodsrule');
-        $rule = $this->irodsrule->make('uuFrontEndGetUserGroupsForStatisticsDM', $inputParams, $outputParams);
-
-        $result = $rule->execute();
-
-        if ($result['*status'] == 'Success') { // Bring list back to only research groups
-            $allResearchGroups = array();
-            foreach($result['*data'] as $group) {
-                $allResearchGroups[] = $group; // For datamanager show all groups - not limited to research like when a user
-            }
-
-            return array('*status' => $result['*status'],
-                '*statusInfo' => $result['*statusInfo'],
-                '*data' => $allResearchGroups
-            );
-        }
-
-        return $result;
-    }
-
 
 
     // Per tier, per month get a full twelve months of storage data for the group
