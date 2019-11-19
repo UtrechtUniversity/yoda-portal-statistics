@@ -1,13 +1,13 @@
 <div class="panel panel-default properties">
     <div class="panel-heading">
-        <h3 class="panel-title">Resource properties (<?php echo $name; ?>)</h3>
+        <h3 class="panel-title">Resource properties (<?php echo htmlentities($name); ?>)</h3>
     </div>
     <div class="panel-body">
         <form method="POST" class="form-horizontal" id="resource-properties-form">
             <div class="form-group">
                 <label class="col-sm-4 control-label">Name</label>
                 <div class="col-sm-8">
-                    <p class="form-control-static"><?php echo $name; ?></p>
+                    <p class="form-control-static"><?php echo htmlentities($name); ?></p>
                 </div>
             </div>
             <div class="form-group">
