@@ -54,6 +54,9 @@ class Statistics extends MY_Controller
 
         if ($isRodsAdmin == 'yes') {
             $result = $this->obj_to_array($this->api->call('uu_resource_resource_and_tier_data'));
+//            echo '<pre>';
+//            print_r($result);
+//            echo '</pre>';
             $resources = $result['data'];
 
             $result = $this->obj_to_array($this->api->call('uu_resource_monthly_stats'));
@@ -82,8 +85,10 @@ class Statistics extends MY_Controller
         }
 
         $viewParams = array(
-            'styleIncludes' => array('css/statistics.css'),
-            'scriptIncludes' => array('js/statistics.js', 'lib/chartjs/chart.min.js'),
+            'styleIncludes' => array('css/statistics.css','lib/select2/css/select2.css',
+                                                        //   'lib/select2/select2-bootstrap.min.css',
+            ),
+            'scriptIncludes' => array('js/statistics.js', 'lib/chartjs/chart.min.js', 'lib/select2/js/select2.js'),
             'activeModule'   => 'statistics',
             'isDatamanager'  => $isDatamanager,
             'isRodsAdmin'  => $isRodsAdmin,

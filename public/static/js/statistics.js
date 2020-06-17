@@ -38,6 +38,11 @@ function makeItemActive(currentItem)
 
 function getDetails(resource)
 {
+    // alert('BEFORE select2tier');
+    // select2Tier();
+    // alert('After select2tier');
+    // return;
+
     var url = "statistics/resource_details?resource=" + encodeURIComponent(resource);
     $.getJSON(url, function( data ) {
         if (data.status == 'success') {
@@ -46,11 +51,14 @@ function getDetails(resource)
             // Select2 plugin - Select tier
             select2Tier();
 
+            alert('after select tiers');
+
             $( "#resource-properties-form" ).submit(function( event ) {
                 event.preventDefault();
                 $('.update-resource-properties-btn').addClass('disabled').val('Updating...');
 
-                var value = $('.tier-select').data('select2').val();
+                //var value = $('.tier-select').data('select2').val();
+                var value = 'BLA';
                 editTier(resource, value);
             });
         }
@@ -153,12 +161,26 @@ Number.prototype.countDecimals = function () {
     return this.toString().split(".")[1].length || 0;
 }
 
+
+// function select2Tier()
+// {   //return;
+//     console.log('ik kom hier1');
+//     $('.tier-select').select2({
+//         ajax: {
+//             url: Yoda.baseUrl + 'statistics/get_tiers',
+//             dataType: 'json',
+//         }
+//     });
+// }
+//
+
 function select2Tier()
 {
-    $('.tier-select').select2({
+    console.log(Yoda.baseUrl + 'statistics/get_tiers');
+    $('.tier-select2').select2({
         ajax: {
             delay:    250,
-            url:      YodaPortal.baseUrl + 'statistics/get_tiers',
+            url:      Yoda.baseUrl + 'statistics/get_tiers',
             type:     'get',
             dataType: 'json',
             data: function (term, page) {
@@ -187,7 +209,7 @@ function select2Tier()
                 }
 
                 return { results: results };
-            },
+            }
         },
         formatResult: function(result, $container, query, escaper) {
             return escaper(result.text)
@@ -205,9 +227,9 @@ function select2Tier()
 
 function editTier(resource, val)
 {
-    var tokenName = YodaPortal.csrf.tokenName;
-    var tokenValue = YodaPortal.csrf.tokenValue;
-    $.post( YodaPortal.baseUrl + 'statistics/edit_tier', { resource: resource, value: val, csrf_yoda: tokenValue})
+    var tokenName = Yoda.csrf.tokenName;
+    var tokenValue = Yoda.csrf.tokenValue;
+    $.post( Yoda.baseUrl + 'statistics/edit_tier', { resource: resource, value: val, csrf_yoda: tokenValue})
         .done(function( data ) {
             if (data.status == 'Success') {
                 $('#messages').html('<div class="alert alert-success"><button class="close" data-dismiss="alert"><span>×</span></button><p>Updated  ' + resource + ' properties.</p></div>');
