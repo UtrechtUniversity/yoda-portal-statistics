@@ -47,7 +47,7 @@ function getDetails(resource)
             $('.resource-details').html(data.html);
 
             // Select2 plugin - Select tier
-            //select2Tier();
+            select2Tier();
 
             $( "#resource-properties-form" ).submit(function( event ) {
                 event.preventDefault();
