@@ -31,8 +31,8 @@ class Statistics extends MY_Controller
 
     public function index()
     {
-        $userType = $this->api->call('uu_resource_user_get_type')->data;
-        $isDatamanager = $this->api->call('uu_resource_user_is_datamanager')->data;
+        $userType = $this->api->call('resource_user_get_type')->data;
+        $isDatamanager = $this->api->call('resource_user_is_datamanager')->data;
 
         $isRodsAdmin = 'no';
         $isResearcher = 'no';
@@ -51,10 +51,10 @@ class Statistics extends MY_Controller
         $this->load->helper('bytes');
 
         if ($isRodsAdmin == 'yes') {
-            $result = $this->obj_to_array($this->api->call('uu_resource_resource_and_tier_data'));
+            $result = $this->obj_to_array($this->api->call('resource_resource_and_tier_data'));
             $resources = $result['data'];
 
-            $result = $this->obj_to_array($this->api->call('uu_resource_monthly_stats'));
+            $result = $this->obj_to_array($this->api->call('resource_monthly_stats'));
             $storageTableData = array('data' => $result['data']);
 
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
@@ -64,20 +64,20 @@ class Statistics extends MY_Controller
         $groups = array();  // used for both datamanager as well as researchers
         // Storage table for datamanager
         if ($isDatamanager == 'yes') {
-            $result = $this->obj_to_array($this->api->call('uu_resource_monthly_stats_dm'));
+            $result = $this->obj_to_array($this->api->call('resource_monthly_stats_dm'));
             $storageTableData = array('data' => $result['data']);
 
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
             $storageTableDatamanager = $storageTable;
 
-            $result = $this->obj_to_array($this->api->call('uu_resource_groups_dm'));
+            $result = $this->obj_to_array($this->api->call('resource_groups_dm'));
             $groups = $result['data'];
         }
         else {
             // Researcher - get group data.
             if ($isResearcher == 'yes') {
                 // Alleen research groups!!
-                $groups = $this->api->call('uu_resource_user_research_groups')->data;
+                $groups = $this->api->call('resource_user_research_groups')->data;
             }
         }
 
@@ -103,7 +103,7 @@ class Statistics extends MY_Controller
         $pathStart = $this->pathlibrary->getPathStart($this->config);
         $resourceName = $this->input->get('resource');
 
-        $result = $this->api->call('uu_resource_tier', ['res_name' => $resourceName]);
+        $result = $this->api->call('resource_tier', ['res_name' => $resourceName]);
         // FIXME: Keep assuming success for now.
         $html = $this->load->view('detail', ['name' => $resourceName, 'tier' => $result->data], true);
         $output = array('status' => 'success', 'html' => $html);
@@ -138,7 +138,7 @@ class Statistics extends MY_Controller
 
     public function get_tiers()
     {
-        $tiers = $this->api->call('uu_resource_get_tiers')->data;
+        $tiers = $this->api->call('resource_get_tiers')->data;
 
         $this->output
             ->set_content_type('application/json')
@@ -150,7 +150,7 @@ class Statistics extends MY_Controller
 //        $resource = $this->input->post('resource');
 //        $value = $this->input->post('value');
 //
-//        $status = $this->api->call('uu_resource_save_tier', ['resource_name'=> $resource, 'tier_name'=> $value])->status;
+//        $status = $this->api->call('resource_save_tier', ['resource_name'=> $resource, 'tier_name'=> $value])->status;
 //        $output = array('status' => $status);
 //
 //        $this->output
@@ -166,10 +166,10 @@ class Statistics extends MY_Controller
         $zone = $this->config->item('rodsServerZone');
 
 //        $userType = $this->User_model->getType();
-        $userType = $this->api->call('uu_resource_user_get_type')->data;
+        $userType = $this->api->call('resource_user_get_type')->data;
 
         //$isDatamanager = $this->User_model->isDatamanager();
-        $isDatamanager = $this->api->call('uu_resource_user_is_datamanager')->data;
+        $isDatamanager = $this->api->call('resource_user_is_datamanager')->data;
 
         if ($userType == 'rodsadmin' || $isDatamanager == 'yes') {
             // create a file pointer connected to the output stream
@@ -199,7 +199,7 @@ class Statistics extends MY_Controller
 
                 fputcsv($output, $row, $delimiter);
 
-                $result = $this->obj_to_array($this->api->call('uu_resource_monthly_category_stats_export_dm'));
+                $result = $this->obj_to_array($this->api->call('resource_monthly_category_stats_export_dm'));
 
                 // Process the storage data
                 // COnvert to array in which can be easlily indexed on month
@@ -241,7 +241,7 @@ class Statistics extends MY_Controller
                 $row = array('instance name (zone)', 'category name', 'tier', 'amount of storage in use in bytes');
                 fputcsv($output, $row, $delimiter);
 
-                $result = $this->obj_to_array($this->api->call('uu_resource_monthly_stats'));
+                $result = $this->obj_to_array($this->api->call('resource_monthly_stats'));
 
                 foreach ($result['data'] as $row) {
                     $row = array($zone, $row['category'], $row['tier'], $row['storage']);
@@ -260,7 +260,7 @@ class Statistics extends MY_Controller
     private function _getFullYearDataForGroupPerTierPerMonth($groupName)
     {
         $currentMonth = date('m');
-        $result = $this->obj_to_array($this->api->call('uu_resource_full_year_group_data', ['group_name'=>$groupName, 'current_month'=>intval($currentMonth)]));
+        $result = $this->obj_to_array($this->api->call('resource_full_year_group_data', ['group_name'=>$groupName, 'current_month'=>intval($currentMonth)]));
 
         if ($result['status'] == 'ok') {
             $tiers = array(); // to build seperated lists with tiers as a basis
