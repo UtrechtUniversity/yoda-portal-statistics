@@ -53,10 +53,10 @@ class Statistics extends MY_Controller
         $this->load->helper('bytes');
 
         if ($isRodsAdmin == 'yes') {
-            $result = $this->obj_to_array($this->api->call('uu_resource_resource_and_tier_data'));
+            $result = $this->obj_to_array($this->api->call('resource_resource_and_tier_data'));
             $resources = $result['data'];
 
-            $result = $this->obj_to_array($this->api->call('uu_resource_monthly_stats'));
+            $result = $this->obj_to_array($this->api->call('resource_monthly_stats'));
             $storageTableData = array('data' => $result['data']);
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
             $storageTableAdmin = $storageTable;
@@ -65,12 +65,12 @@ class Statistics extends MY_Controller
         $groups = array();  // used for both datamanager as well as researchers
         // Storage table for datamanager
         if ($isDatamanager == 'yes') {
-            $result = $this->obj_to_array($this->api->call('uu_resource_monthly_stats_dm'));
+            $result = $this->obj_to_array($this->api->call('resource_monthly_stats_dm'));
             $storageTableData = array('data' => $result['data']);
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
             $storageTableDatamanager = $storageTable;
 
-            $result = $this->obj_to_array($this->api->call('uu_resource_groups_dm'));
+            $result = $this->obj_to_array($this->api->call('resource_groups_dm'));
             $groups = $result['data'];
         }
         else {
@@ -103,7 +103,7 @@ class Statistics extends MY_Controller
         $pathStart = $this->pathlibrary->getPathStart($this->config);
         $resourceName = $this->input->get('resource');
 
-        $result = $this->api->call('uu_resource_tier', ['res_name' => $resourceName]);
+        $result = $this->api->call('resource_tier', ['res_name' => $resourceName]);
         // FIXME: Keep assuming success for now.
         $html = $this->load->view('detail', ['name' => $resourceName, 'tier' => $result->data], true);
         $output = array('status' => 'success', 'html' => $html);
@@ -195,7 +195,7 @@ class Statistics extends MY_Controller
 
                 fputcsv($output, $row, $delimiter);
 
-                $result = $this->obj_to_array($this->api->call('uu_resource_monthly_category_stats_export_dm'));
+                $result = $this->obj_to_array($this->api->call('resource_monthly_category_stats_export_dm'));
 
                 // Process the storage data
                 // COnvert to array in which can be easlily indexed on month
@@ -237,7 +237,7 @@ class Statistics extends MY_Controller
                 $row = array('instance name (zone)', 'category name', 'tier', 'amount of storage in use in bytes');
                 fputcsv($output, $row, $delimiter);
 
-                $result = $this->obj_to_array($this->api->call('uu_resource_monthly_stats'));
+                $result = $this->obj_to_array($this->api->call('resource_monthly_stats'));
 
                 foreach ($result['data'] as $row) {
                     $row = array($zone, $row['category'], $row['tier'], $row['storage']);
