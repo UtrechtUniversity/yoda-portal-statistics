@@ -17,9 +17,6 @@ class Statistics extends MY_Controller
 
         $this->data['userIsAllowed'] = TRUE;
 
-        $this->load->model('Storage_model');
-        $this->load->model('User_model');
-        $this->load->model('Tier_model');
         $this->load->library('pathlibrary');
         $this->load->library('api');
     }
@@ -34,8 +31,9 @@ class Statistics extends MY_Controller
 
     public function index()
     {
-        $userType = $this->User_model->getType();
-        $isDatamanager = $this->User_model->isDatamanager();
+        $userType = $this->api->call('resource_user_get_type')->data;
+        $isDatamanager = $this->api->call('resource_user_is_datamanager')->data;
+
         $isRodsAdmin = 'no';
         $isResearcher = 'no';
         if ($userType == 'rodsadmin') {
@@ -58,6 +56,7 @@ class Statistics extends MY_Controller
 
             $result = $this->obj_to_array($this->api->call('resource_monthly_stats'));
             $storageTableData = array('data' => $result['data']);
+
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
             $storageTableAdmin = $storageTable;
         }
@@ -67,6 +66,7 @@ class Statistics extends MY_Controller
         if ($isDatamanager == 'yes') {
             $result = $this->obj_to_array($this->api->call('resource_monthly_stats_dm'));
             $storageTableData = array('data' => $result['data']);
+
             $storageTable = $this->load->view('storage_table', $storageTableData, true);
             $storageTableDatamanager = $storageTable;
 
@@ -76,8 +76,8 @@ class Statistics extends MY_Controller
         else {
             // Researcher - get group data.
             if ($isResearcher == 'yes') {
-                $result = $this->Storage_model->getGroupsOfCurrentUser();
-                $groups = $result['*data'];
+                // Alleen research groups!!
+                $groups = $this->api->call('resource_user_research_groups')->data;
             }
         }
 
@@ -123,12 +123,13 @@ class Statistics extends MY_Controller
         }
 
         $groupName = $this->input->get('group');
-        $storageData = $this->Storage_model->getFullYearDataForGroupPerTierPerMonth($groupName);
-        $viewData = array('name' => $groupName, 'storageData' => $storageData['*data'], 'showStorage' => $showStorage);
+        $storageData = $this->_getFullYearDataForGroupPerTierPerMonth($groupName);
+
+        $viewData = array('name' => $groupName, 'storageData' => $storageData['data'], 'showStorage' => $showStorage);
         $html = $this->load->view('group_details', $viewData, true);
         $output = array('status' => 'success',
 	                'html' => $html,
-			'storageData' => $storageData['*data']);
+			'storageData' => $storageData['data']);
 
         $this->output
             ->set_content_type('application/json')
@@ -137,25 +138,25 @@ class Statistics extends MY_Controller
 
     public function get_tiers()
     {
-        $tiers = $this->Tier_model->listTiers();
+        $tiers = $this->api->call('resource_get_tiers')->data;
 
         $this->output
             ->set_content_type('application/json')
             ->set_output(json_encode($tiers));
     }
 
-    public function edit_tier()
-    {
-        $resource = $this->input->post('resource');
-        $value = $this->input->post('value');
-
-        $result = $this->Storage_model->setResourceTier($resource, $value);
-        $output = array('status' => $result);
-
-        $this->output
-            ->set_content_type('application/json')
-            ->set_output(json_encode($output));
-    }
+//    public function edit_tier()
+//    {
+//        $resource = $this->input->post('resource');
+//        $value = $this->input->post('value');
+//
+//        $status = $this->api->call('resource_save_tier', ['resource_name'=> $resource, 'tier_name'=> $value])->status;
+//        $output = array('status' => $status);
+//
+//        $this->output
+//            ->set_content_type('application/json')
+//            ->set_output(json_encode($output));
+//    }
 
     // Export of storage information
     // Differentiation for rodsadmin and datamanager.
@@ -164,8 +165,11 @@ class Statistics extends MY_Controller
         $delimiter = ';';
         $zone = $this->config->item('rodsServerZone');
 
-        $userType = $this->User_model->getType();
-        $isDatamanager = $this->User_model->isDatamanager();
+//        $userType = $this->User_model->getType();
+        $userType = $this->api->call('resource_user_get_type')->data;
+
+        //$isDatamanager = $this->User_model->isDatamanager();
+        $isDatamanager = $this->api->call('resource_user_is_datamanager')->data;
 
         if ($userType == 'rodsadmin' || $isDatamanager == 'yes') {
             // create a file pointer connected to the output stream
@@ -249,5 +253,77 @@ class Statistics extends MY_Controller
             // Send the output buffer.
             ob_flush();
         }
+    }
+
+    // Per tier, per month get a full twelve months of storage data for the group
+    // taken from last month up until 12 months back
+    private function _getFullYearDataForGroupPerTierPerMonth($groupName)
+    {
+        $currentMonth = date('m');
+        $result = $this->obj_to_array($this->api->call('resource_full_year_group_data', ['group_name'=>$groupName, 'current_month'=>intval($currentMonth)]));
+
+        if ($result['status'] == 'ok') {
+            $tiers = array(); // to build seperated lists with tiers as a basis
+            $receivedData = array();
+            $fullYearData = array();
+            $totalStorage = 0;
+
+            if (is_array($result['data'])) {
+                //print_r($result['*data']);exit;
+
+                foreach($result['data'] as $data) {
+                    foreach($data as $key=>$storage) {
+                        // key contains month & tiername -> decipher
+                        // month=12-tier=blabla
+                        $parts = explode('-tier=', $key);
+                        $monthParts = explode('=', $parts[0]);
+                        $month = $monthParts[1];
+                        $tier = $parts[1];
+
+                        // Build a list of tiers that come by in statistics
+                        if(!in_array($tier, $tiers)) {
+                            $tiers[] = $tier;
+                        }
+
+                        $this->config->load('config');
+                        $this->load->helper('bytes');
+                        $chartShowStorage = $this->config->item('chartShowStorage');
+                        if ($chartShowStorage == 'TB') {
+                            $storage = roundUpBytes(bytesToTerabytes((int) $storage), 1);
+                        }
+
+                        $receivedData[$tier][$month] = $storage;
+                        $totalStorage += $storage;
+                    }
+                }
+            }
+
+            // Build an array with all months present and separated by tiers as
+            // Step back in time
+            foreach ($tiers as $tier){
+                for ($i=0; $i<12; $i++) {
+                    $storageMonth = $currentMonth - $i;
+                    if($storageMonth<1) {
+                        $storageMonth += 12;
+                    }
+                    $fullYearData[$tier][$storageMonth] = isset($receivedData[$tier][$storageMonth]) ? $receivedData[$tier][$storageMonth] : 0;
+                }
+            }
+
+            // supporting info for the frontend
+            $monthsOrder = array();
+            for ($i=0; $i<12; $i++) {
+                $storageMonth = $currentMonth - $i;
+                $monthsOrder[11-$i] = ( ($storageMonth)<1?($storageMonth+12):$storageMonth  ); // reverse the order of months
+            }
+            return array('status' => $result['status'],
+                    'status_info' => $result['status_info'],
+                    'data' => array( 'tiers' => $fullYearData,
+                    'months' => $monthsOrder,
+                    'totalStorage' => $totalStorage
+                )
+            );
+        }
+        return $result;
     }
 }
