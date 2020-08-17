@@ -1,8 +1,8 @@
-<div class="panel panel-default properties">
-    <div class="panel-heading">
-        <h3 class="panel-title">Group storage (<?php echo $name; ?>)</h3>
+<div class="card properties">
+    <div class="card-header">
+        Group storage (<?php echo $name; ?>)
     </div>
-    <div class="panel-body">
+    <div class="card-body">
         <?php if (!isset($storageData['totalStorage']) || $storageData['totalStorage'] == 0) { ?>
             <p>No storage information found.</p>
         <?php } else { ?>
