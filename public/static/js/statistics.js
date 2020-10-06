@@ -40,6 +40,9 @@ function getDetails(resource)
 {
     var url = "statistics/resource_details?resource=" + encodeURIComponent(resource);
     $.getJSON(url, function( data ) {
+
+        console.log(data);
+
         if (data.status == 'success') {
             $('.resource-details').html(data.html);
 
@@ -158,7 +161,7 @@ function select2Tier()
     $('.tier-select').select2({
         ajax: {
             delay:    250,
-            url:      YodaPortal.baseUrl + 'statistics/get_tiers',
+            url:      Yoda.baseUrl + 'statistics/get_tiers',
             type:     'get',
             dataType: 'json',
             data: function (term, page) {
@@ -203,28 +206,29 @@ function select2Tier()
     });
 }
 
-function editTier(resource, val)
-{
-    var tokenName = YodaPortal.csrf.tokenName;
-    var tokenValue = YodaPortal.csrf.tokenValue;
-    $.post( YodaPortal.baseUrl + 'statistics/edit_tier', { resource: resource, value: val, csrf_yoda: tokenValue})
-        .done(function( data ) {
-            if (data.status == 'Success') {
-                $('#messages').html('<div class="alert alert-success"><button class="close" data-dismiss="alert"><span>×</span></button><p>Updated  ' + resource + ' properties.</p></div>');
-            } else {
-                $('#messages').html('<div class="alert alert-danger"><button class="close" data-dismiss="alert"><span>×</span></button><p>Could not update ' + resource + ' properties  due to an internal error.</p></div>');
-            }
+async function editTier(resource, val) {
+    let result = await Yoda.call('resource_save_tier',
+        { resource_name: resource,
+          tier_name: val
+        }
+    );
 
-            $('.list-group-item.active .resource-tier').attr('title', htmlDecode(val));
+    console.log(result);
+    if (result.status == 'ok') {
+        $('#messages').html('<div class="alert alert-success"><button class="close" data-dismiss="alert"><span>×</span></button><p>Updated  ' + resource + ' properties.</p></div>');
+    } else {
+        $('#messages').html('<div class="alert alert-danger"><button class="close" data-dismiss="alert"><span>×</span></button><p>Could not update ' + resource + ' properties  due to an internal error.</p></div>');
+    }
 
-            var text = val;
-            if (text.length > 10) {
-                text = val.substr(0, 10) + '...';
-            }
-            $('.list-group-item.active .resource-tier').text(htmlDecode(text));
+    $('.list-group-item.active .resource-tier').attr('title', htmlDecode(val));
 
-            resetSubmitButton($('.update-resource-properties-btn'));
-        });
+    var text = val;
+    if (text.length > 10) {
+        text = val.substr(0, 10) + '...';
+    }
+    $('.list-group-item.active .resource-tier').text(htmlDecode(text));
+
+    resetSubmitButton($('.update-resource-properties-btn'));
 }
 
 function resetSubmitButton($el) {
