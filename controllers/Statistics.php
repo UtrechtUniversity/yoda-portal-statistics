@@ -83,7 +83,7 @@ class Statistics extends MY_Controller
 
         $viewParams = array(
             'styleIncludes' => array('css/statistics.css', 'lib/select2/css/select2.min.css'),
-            'scriptIncludes' => array('js/statistics.js', 'lib/chartjs/chart.min.js', 'lib/select2/js/select2.min.js'),
+            'scriptIncludes' => array('js/statistics.js', 'lib/chartjs/chart.min.js', 'lib/select2/js/select2.full.min.js'),
             'activeModule'   => 'statistics',
             'isDatamanager'  => $isDatamanager,
             'isRodsAdmin'  => $isRodsAdmin,

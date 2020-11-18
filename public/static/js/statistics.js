@@ -40,9 +40,6 @@ function getDetails(resource)
 {
     var url = "statistics/resource_details?resource=" + encodeURIComponent(resource);
     $.getJSON(url, function( data ) {
-
-        console.log(data);
-
         if (data.status == 'success') {
             $('.resource-details').html(data.html);
 
@@ -213,7 +210,6 @@ async function editTier(resource, val) {
         }
     );
 
-    console.log(result);
     if (result.status == 'ok') {
         $('#messages').html('<div class="alert alert-success"><button class="close" data-dismiss="alert"><span>×</span></button><p>Updated  ' + resource + ' properties.</p></div>');
     } else {
