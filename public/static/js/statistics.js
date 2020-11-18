@@ -162,9 +162,9 @@ function select2Tier()
             type:     'get',
             dataType: 'json',
             data: {},
-            results: function (tiers) {
+            processResults: function (tiers) {
                 var results = [];
-                var query   = $('.tier-select').data('select2').search.val();
+                var query   = $('.tier-select').data('select2').$dropdown.find(':input.select2-search__field').val();
                 var inputMatches = false;
 
                 tiers.forEach(function(tier) {
@@ -179,24 +179,13 @@ function select2Tier()
                 if (!inputMatches && query.length) {
                     results.push({
                         id:     query,
-                        text:   query,
+                        text:   query + ' (create)',
                         exists: false
                     });
                 }
 
                 return { results: results };
-            },
-        },
-        formatResult: function(result, $container, query, escaper) {
-            return escaper(result.text)
-                + (
-                    'exists' in result && !result.exists
-                        ? ' <span class="grey">(create)</span>'
-                        : ''
-                );
-        },
-        initSelection: function($el, callback) {
-            callback({ id: $el.val(), text: $el.val() });
+            }
         }
     });
 }

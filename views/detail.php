@@ -13,7 +13,9 @@
             <div class="form-group row">
                 <label class="col-sm-4 col-form-label">Tier</label>
                 <div class="col-sm-8">
-                    <select type="text" class="tier-select" value="<?php echo htmlentities($tier); ?>"></select>
+                    <select type="text" class="tier-select" value="<?php echo htmlentities($tier); ?>">
+                        <option value="<?php echo htmlentities($tier); ?>"><?php echo htmlentities($tier); ?></option>
+                    </select>
                 </div>
             </div>
             <div class="form-group row">
