@@ -161,9 +161,7 @@ function select2Tier()
             url:      Yoda.baseUrl + 'statistics/get_tiers',
             type:     'get',
             dataType: 'json',
-            data: function (term, page) {
-                return { query: term };
-            },
+            data: {},
             results: function (tiers) {
                 var results = [];
                 var query   = $('.tier-select').data('select2').search.val();
