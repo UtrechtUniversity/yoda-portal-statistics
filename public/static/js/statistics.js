@@ -192,9 +192,8 @@ function select2Tier()
 
 async function editTier(resource, val) {
     let result = await Yoda.call('resource_save_tier',
-        { resource_name: resource,
-          tier_name: val
-        }
+        {resource_name: resource, tier_name: val},
+        {rawResult: true}
     );
 
     if (result.status == 'ok') {
