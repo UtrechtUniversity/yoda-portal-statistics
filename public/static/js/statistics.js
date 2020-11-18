@@ -210,11 +210,7 @@ async function editTier(resource, val) {
     }
     $('.list-group-item.active .resource-tier').text(htmlDecode(text));
 
-    resetSubmitButton($('.update-resource-properties-btn'));
-}
-
-function resetSubmitButton($el) {
-    $el.removeClass('disabled').val('Update');
+    getDetails(resource);
 }
 
 function htmlDecode(inp){
